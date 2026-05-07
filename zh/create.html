@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>撰寫 Manifest — CLIbrary-Hub</title>
+<meta name="description" content="一步一步教你寫 CLIbrary manifest.json，讓 AI agent 能找到並呼叫你的 CLI 工具。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080c10; --surface: #0e1419; --border: #1e2a35;
+    --accent: #00e5a0; --accent-dim: #00e5a020;
+    --text: #e8edf2; --muted: #5a7080;
+    --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.75; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px; opacity: 0.4; pointer-events: none; z-index: 0;
+  }
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 2rem; background: rgba(8,12,16,0.85);
+    backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+  }
+  .logo { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .logo span { color: var(--accent); }
+  .logo a { color: inherit; text-decoration: none; }
+  nav a { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
+  nav a:hover { color: var(--accent); }
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+  .nav-cta { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent) !important; padding: 0.5rem 1rem; border-radius: 4px; }
+  .lang { color: var(--accent) !important; }
+  main { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 8rem 2rem 4rem; }
+  h1 { font-family: var(--mono); font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.03em; margin-bottom: 1rem; }
+  h1 span { color: var(--accent); }
+  .lead { color: var(--muted); max-width: 720px; margin-bottom: 3rem; font-size: 1.05rem; }
+  h2 { font-family: var(--mono); font-size: 1.4rem; margin-top: 3rem; margin-bottom: 1rem; letter-spacing: -0.01em; border-top: 1px solid var(--border); padding-top: 2rem; }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  h3 { font-family: var(--mono); font-size: 1rem; margin-top: 2rem; margin-bottom: 0.6rem; }
+  p { margin-bottom: 1rem; }
+  .section-label { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 0.5rem; }
+  .step {
+    display: inline-block; font-family: var(--mono); font-size: 0.78rem;
+    color: var(--accent); background: var(--accent-dim); border: 1px solid var(--accent);
+    padding: 0.2rem 0.6rem; border-radius: 3px; margin-right: 0.6rem; letter-spacing: 0.08em;
+  }
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem; margin: 1rem 0; overflow-x: auto; font-family: var(--mono); font-size: 0.85rem; line-height: 1.6; }
+  pre code { background: none; border: none; padding: 0; color: var(--text); }
+  .k { color: #7dd3fc; } .s { color: #86efac; } .c { color: #4b5563; font-style: italic; } .n { color: #fbbf24; }
+  code { font-family: var(--mono); font-size: 0.85rem; background: var(--surface); padding: 0.15rem 0.45rem; border-radius: 3px; border: 1px solid var(--border); }
+  ul, ol { margin: 0.5rem 0 1.5rem 1.5rem; }
+  ul li, ol li { margin-bottom: 0.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1rem 0 2rem; }
+  th, td { padding: 0.6rem 0.9rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: normal; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; background: var(--surface); font-family: var(--mono); }
+  td code { font-size: 0.78rem; }
+  .callout { background: var(--accent-dim); border-left: 3px solid var(--accent); padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.92rem; }
+  .callout strong { color: var(--accent); }
+  .warn { background: #f8717110; border-left: 3px solid #f87171; padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; font-size: 0.92rem; }
+  .warn strong { color: #f87171; }
+  .check { color: var(--accent); font-weight: bold; }
+  .cross { color: #f87171; font-weight: bold; }
+  footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><a href="/zh/">CLIbrary<span>-Hub</span></a></div>
+  <div class="nav-links">
+    <a href="/zh/benchmark.html">效能評測</a>
+    <a href="/zh/create.html" class="lang">寫 Manifest</a>
+    <a href="/create.html">EN</a>
+    <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
+  </div>
+</nav>
+
+<main>
+  <p class="section-label">教學</p>
+  <h1>自己寫一個<br><span>manifest</span>。</h1>
+  <p class="lead">
+    Manifest 是一個 JSON 檔，告訴 AI agent 你的 CLI 做什麼、什麼時候該用、怎麼呼叫。
+    這篇教學會帶你走完每個必填欄位，以及那些讓 manifest「被找到」的小習慣。
+  </p>
+
+  <h2><span class="step">步驟 1</span>四個問題</h2>
+  <p>每個 manifest 都在回答四個問題。如果你能用一段話回答，你就能寫一個 manifest。</p>
+
+  <table>
+    <thead>
+      <tr><th>問題</th><th>欄位</th><th>格式</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>它做什麼？</td><td><code>description</code></td><td>10–200 字，平實英文</td></tr>
+      <tr><td>什麼時候 agent 該選它？</td><td><code>intent_triggers</code></td><td>≥ 5 條，混合語言</td></tr>
+      <tr><td>它需要什麼輸入？</td><td><code>input_schema</code></td><td>類似 JSON Schema</td></tr>
+      <tr><td>它回傳什麼？</td><td><code>output_schema</code></td><td><code>json</code> / <code>csv</code> / <code>text</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="step">步驟 2</span>選一個分類</h2>
+  <p>把 manifest 放到對的資料夾。共 10 個分類，挑最接近的一個就好。</p>
+  <ul>
+    <li><code>ai-ml</code> — 模型推論、embedding、語音轉文字、OCR</li>
+    <li><code>data</code> — SQL、CSV、ETL、schema 解析</li>
+    <li><code>devops</code> — Docker、git、CI/CD、程式碼分析、lint</li>
+    <li><code>media</code> — 影音圖片處理</li>
+    <li><code>web</code> — HTTP、爬蟲、API 工具</li>
+    <li><code>security</code> — 掃描、稽核、加密</li>
+    <li><code>productivity</code> — 檔案、文字轉換、文件工具</li>
+    <li><code>finance</code> — 行情、發票、會計</li>
+    <li><code>science</code> — 單位、統計、計算</li>
+    <li><code>networking</code> — DNS、IP、封包診斷</li>
+  </ul>
+
+  <h2><span class="step">步驟 3</span>完整範本</h2>
+  <p>存成 <code>manifests/&lt;分類&gt;/&lt;你的工具&gt;.json</code>，然後改裡面的欄位。</p>
+
+<pre><code>{
+  <span class="k">"name"</span>: <span class="s">"video-to-gif"</span>,
+  <span class="k">"version"</span>: <span class="s">"1.0.0"</span>,
+  <span class="k">"category"</span>: <span class="s">"media"</span>,
+  <span class="k">"description"</span>: <span class="s">"Convert a video file to an animated GIF with configurable framerate and resolution"</span>,
+
+  <span class="k">"intent_triggers"</span>: [
+    <span class="s">"convert mp4 to gif"</span>,
+    <span class="s">"turn this video into a gif"</span>,
+    <span class="s">"make a short looping animation from this clip"</span>,
+    <span class="s">"export the first 5 seconds of a video as a gif"</span>,
+    <span class="s">"reduce framerate when generating gif"</span>,
+    <span class="s">"把影片轉成 GIF"</span>,
+    <span class="s">"幫我把這段影片做成 gif 動圖"</span>
+  ],
+
+  <span class="k">"input_schema"</span>: {
+    <span class="k">"input"</span>:  { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"required"</span>: <span class="n">true</span>,  <span class="k">"description"</span>: <span class="s">"來源影片檔的路徑"</span> },
+    <span class="k">"output"</span>: { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"required"</span>: <span class="n">true</span>,  <span class="k">"description"</span>: <span class="s">"輸出 GIF 的路徑"</span> },
+    <span class="k">"fps"</span>:    { <span class="k">"type"</span>: <span class="s">"integer"</span>, <span class="k">"required"</span>: <span class="n">false</span>, <span class="k">"default"</span>: <span class="n">15</span>, <span class="k">"description"</span>: <span class="s">"每秒幀數"</span> },
+    <span class="k">"width"</span>:  { <span class="k">"type"</span>: <span class="s">"integer"</span>, <span class="k">"required"</span>: <span class="n">false</span>, <span class="k">"description"</span>: <span class="s">"輸出寬度（像素），高度按比例自動"</span> }
+  },
+
+  <span class="k">"output_schema"</span>: {
+    <span class="k">"format"</span>: <span class="s">"json"</span>,
+    <span class="k">"fields"</span>: [<span class="s">"output_path"</span>, <span class="s">"frame_count"</span>, <span class="s">"file_size_bytes"</span>, <span class="s">"duration_ms"</span>]
+  },
+
+  <span class="k">"examples"</span>: [
+    {
+      <span class="k">"query"</span>: <span class="s">"convert demo.mp4 to a 10-fps gif"</span>,
+      <span class="k">"params"</span>: { <span class="k">"input"</span>: <span class="s">"demo.mp4"</span>, <span class="k">"output"</span>: <span class="s">"demo.gif"</span>, <span class="k">"fps"</span>: <span class="n">10</span> }
+    },
+    {
+      <span class="k">"query"</span>: <span class="s">"把 record.mov 做成寬度 480px 的 gif"</span>,
+      <span class="k">"params"</span>: { <span class="k">"input"</span>: <span class="s">"record.mov"</span>, <span class="k">"output"</span>: <span class="s">"record.gif"</span>, <span class="k">"width"</span>: <span class="n">480</span> }
+    }
+  ],
+
+  <span class="k">"error_codes"</span>: {
+    <span class="k">"1"</span>: <span class="s">"Input file not found"</span>,
+    <span class="k">"2"</span>: <span class="s">"ffmpeg not installed"</span>,
+    <span class="k">"3"</span>: <span class="s">"Unsupported video format"</span>
+  },
+
+  <span class="k">"tags"</span>: [<span class="s">"video"</span>, <span class="s">"gif"</span>, <span class="s">"ffmpeg"</span>, <span class="s">"animation"</span>]
+}</code></pre>
+
+  <h2><span class="step">步驟 4</span>寫好 intent_triggers</h2>
+  <p>這個欄位決定 router 找不找得到你的工具。值得花時間。</p>
+
+  <h3>原則</h3>
+  <ul>
+    <li><strong>≥ 5 條</strong>，最好 7–10 條。一定範圍內越多越好。</li>
+    <li><strong>混合語言。</strong>主要使用者語言每種至少 2 條。中文 + 英文是基本。</li>
+    <li><strong>句型要多樣。</strong>祈使句（「把 X 轉成 Y」）、陳述句（「想要把這做成 gif」）、口語（「幫我做一個 gif」）都要有。</li>
+    <li><strong>涵蓋邊界情況。</strong>如果工具有特殊參數（fps、codec、區段），讓某些 trigger 帶到這些字。</li>
+    <li><strong>不要重複或同義詞。</strong>「convert video to gif」+「change video to gif」浪費一格。</li>
+  </ul>
+
+  <div class="callout">
+    <strong>為什麼這很重要。</strong>
+    Router 會把每條 trigger 向量化用來檢索。多樣化的 trigger 讓你的工具在語意空間佔據更完整的區域，從不同角度的問法都能被找到。
+  </div>
+
+  <h3>反面教材</h3>
+  <ul>
+    <li><span class="cross">✗</span> 五條都是同一句話的小變化</li>
+    <li><span class="cross">✗</span> 只有單一語言</li>
+    <li><span class="cross">✗</span> 跟其他工具大量重疊（「export data」對 <code>csv-export</code> 和 <code>data-dump</code> 都會中）</li>
+    <li><span class="cross">✗</span> 陷阱詞。如果你的工具是 <code>format-fix</code>，不要寫「lint」——會跟 <code>lint-guard</code> 互搶</li>
+  </ul>
+
+  <h2><span class="step">步驟 5</span>至少寫一個 example</h2>
+  <p>Example 是「自然語言 query → 對應參數」的範本。</p>
+
+<pre><code>{
+  <span class="k">"query"</span>: <span class="s">"convert demo.mp4 to a 10-fps gif"</span>,
+  <span class="k">"params"</span>: { <span class="k">"input"</span>: <span class="s">"demo.mp4"</span>, <span class="k">"output"</span>: <span class="s">"demo.gif"</span>, <span class="k">"fps"</span>: <span class="n">10</span> }
+}</code></pre>
+
+  <p>
+    當 agent 的意圖跟某個 example 夠接近（cosine ≥ 0.85），router 直接套用該 example 的
+    <code>params</code>，**完全不需要呼叫 LLM**。這就是「A 路」——零 token、零延遲。
+  </p>
+
+  <div class="callout">
+    <strong>每個工具寫 3–5 個 example。</strong>
+    每個 example 涵蓋一種使用形態（預設參數、常見覆寫、邊界情況）。
+    Example 越多 → A 路命中率越高 → 整體成本越低。
+  </div>
+
+  <h2><span class="step">步驟 6</span>本地驗證</h2>
+
+<pre><code><span class="c"># 安裝 router（會一併拿到 build CLI 工具）</span>
+pip install clibrary-hub
+
+<span class="c"># 把你新加的 manifest 一起 build 進 FAISS index</span>
+clibrary-build-index --manifest-dir ./manifests
+
+<span class="c"># 試幾個自然語言意圖看看 router 選不選得到</span>
+python -c "from clibrary_hub import CLIbrary; r=CLIbrary(); print(r.route('幫我把 demo.mp4 做成 gif'))"</code></pre>
+
+  <p>如果一個明顯的意圖 router 沒選到你的工具，多半是 <code>intent_triggers</code> 多樣性不夠，或關鍵詞錨點太弱。</p>
+
+  <h2><span class="step">步驟 7</span>送 PR</h2>
+  <ol>
+    <li>Fork <a href="https://github.com/clibrary-hub/manifests">clibrary-hub/manifests</a></li>
+    <li>開分支，把 manifest 放到對應分類資料夾並 commit</li>
+    <li>送 PR。簡單說明這個工具做什麼、為什麼 agent 會想用它</li>
+    <li>CI 會自動驗證 schema 並檢查名稱是否重複</li>
+  </ol>
+
+  <h2>常見錯誤</h2>
+  <table>
+    <thead><tr><th>錯誤</th><th>修正</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>description 超過 200 字或寫成行銷文案</td>
+        <td>一句話、白話。寫它做什麼，不寫它有多好。</td>
+      </tr>
+      <tr>
+        <td>只有英文 trigger</td>
+        <td>至少加 2 條使用者會用到的其他語言。</td>
+      </tr>
+      <tr>
+        <td>example 的 <code>params</code> 跑不起來</td>
+        <td>送 PR 前自己跑一次。</td>
+      </tr>
+      <tr>
+        <td><code>error_codes</code> 寫得很空（"1: error"）</td>
+        <td>具體一點：<code>"1": "Input file not found"</code>。</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <strong>不要假造數字。</strong>
+    如果你的工具實際上沒有回傳 <code>frame_count</code>，就不要寫進 <code>output_schema.fields</code>。
+    Agent 會相信這份 manifest 寫的東西。
+  </div>
+
+</main>
+
+<footer>
+  <p>
+    <a href="/zh/">首頁</a>
+    &nbsp;·&nbsp;
+    <a href="/zh/benchmark.html">效能評測</a>
+    &nbsp;·&nbsp;
+    <a href="/create.html">English</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/manifests">GitHub Manifests</a>
+    &nbsp;·&nbsp;
+    MIT License
+  </p>
+</footer>
+
+</body>
+</html>

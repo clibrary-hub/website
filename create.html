@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Write a Manifest — CLIbrary-Hub</title>
+<meta name="description" content="Step-by-step guide for writing a CLIbrary manifest.json so an AI agent can discover your CLI tool.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080c10;
+    --surface: #0e1419;
+    --surface-2: #131a21;
+    --border: #1e2a35;
+    --accent: #00e5a0;
+    --accent-dim: #00e5a020;
+    --text: #e8edf2;
+    --muted: #8a9aa8;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.85;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Grid background — more visible than before */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(30, 42, 53, 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 42, 53, 0.5) 1px, transparent 1px);
+    background-size: 80px 80px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Soft accent glow at top */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse at center, rgba(0, 229, 160, 0.08), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    background: rgba(8, 12, 16, 0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+  .logo a { color: inherit; text-decoration: none; }
+
+  nav a {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--accent); }
+
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+
+  .nav-cta {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    color: var(--accent) !important;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+  }
+
+  .lang-active { color: var(--accent) !important; }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 9rem 2rem 6rem;
+  }
+
+  .hero-block {
+    margin-bottom: 6rem;
+    padding-bottom: 4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 2rem;
+  }
+  h1 span { color: var(--accent); }
+
+  .lead {
+    color: var(--muted);
+    font-size: 1.1rem;
+    line-height: 1.75;
+    max-width: 640px;
+  }
+
+  .step-section {
+    margin-bottom: 6rem;
+  }
+
+  h2 {
+    font-family: var(--mono);
+    font-size: 1.35rem;
+    margin-bottom: 2rem;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  h2 .num {
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    padding: 0.3rem 0.7rem;
+    border-radius: 3px;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 1.75rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.84rem;
+    line-height: 1.75;
+  }
+  pre code { background: none; border: none; padding: 0; color: var(--text); }
+  .k { color: #7dd3fc; }
+  .s { color: #86efac; }
+  .c { color: #6b7280; font-style: italic; }
+  .n { color: #fbbf24; }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    background: var(--surface);
+    padding: 0.18rem 0.5rem;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: #86efac;
+  }
+
+  ul, ol {
+    margin: 1rem 0 2rem 1.5rem;
+    color: var(--text);
+  }
+  ul li, ol li {
+    margin-bottom: 0.9rem;
+    line-height: 1.75;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    margin: 1.5rem 0 2.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 0.95rem 1.1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tr:last-child td { border-bottom: none; }
+  th {
+    color: var(--muted);
+    font-weight: normal;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--surface-2);
+    font-family: var(--mono);
+  }
+  td code { font-size: 0.78rem; }
+
+  .callout {
+    background: var(--accent-dim);
+    border-left: 3px solid var(--accent);
+    padding: 1.5rem 1.75rem;
+    margin: 2.5rem 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+  .callout strong { color: var(--accent); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .warn {
+    background: rgba(248, 113, 113, 0.06);
+    border-left: 3px solid #f87171;
+    padding: 1.5rem 1.75rem;
+    margin: 2.5rem 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+  .warn strong { color: #f87171; }
+  .warn p:last-child { margin-bottom: 0; }
+
+  .check { color: var(--accent); font-weight: bold; margin-right: 0.4rem; }
+  .cross { color: #f87171; font-weight: bold; margin-right: 0.4rem; }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--accent); }
+  footer p { margin: 0; line-height: 2; }
+
+  @media (max-width: 600px) {
+    main { padding: 7rem 1.25rem 4rem; }
+    .hero-block { margin-bottom: 4rem; padding-bottom: 2.5rem; }
+    .step-section { margin-bottom: 4rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><a href="/">CLIbrary<span>-Hub</span></a></div>
+  <div class="nav-links">
+    <a href="/benchmark.html">Benchmark</a>
+    <a href="/create.html" class="lang-active">Write a Manifest</a>
+    <a href="/zh/create.html">中文</a>
+    <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
+  </div>
+</nav>
+
+<main>
+
+  <div class="hero-block">
+    <p class="section-label">Guide</p>
+    <h1>Write your<br>own <span>manifest</span>.</h1>
+    <p class="lead">
+      A manifest is a single JSON file that tells AI agents what your CLI does, when to use it,
+      and how to call it. This guide walks through every required field and the small habits
+      that make a manifest discoverable.
+    </p>
+  </div>
+
+  <section class="step-section">
+    <h2><span class="num">01</span>The four questions</h2>
+    <p>Every manifest answers four questions. If you can answer these in a paragraph, you can write a manifest.</p>
+
+    <table>
+      <thead>
+        <tr><th>Question</th><th>Field</th><th>Format</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>What does it do?</td><td><code>description</code></td><td>10–200 chars, plain English</td></tr>
+        <tr><td>When should the agent reach for it?</td><td><code>intent_triggers</code></td><td>≥ 5 phrases, mixed languages</td></tr>
+        <tr><td>What inputs does it need?</td><td><code>input_schema</code></td><td>JSON Schema-style</td></tr>
+        <tr><td>What does it return?</td><td><code>output_schema</code></td><td><code>json</code> / <code>csv</code> / <code>text</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="step-section">
+    <h2><span class="num">02</span>Pick a category</h2>
+    <p>Place the manifest under the right folder. There are 10 categories — pick the closest fit.</p>
+
+    <ul>
+      <li><code>ai-ml</code> — model inference, embeddings, transcription, OCR</li>
+      <li><code>data</code> — SQL, CSV, ETL, schema introspection</li>
+      <li><code>devops</code> — Docker, git, CI/CD, code analysis, lint</li>
+      <li><code>media</code> — video, image, audio processing</li>
+      <li><code>web</code> — HTTP, scraping, API utilities</li>
+      <li><code>security</code> — scanning, audit, encryption</li>
+      <li><code>productivity</code> — files, text conversion, document tools</li>
+      <li><code>finance</code> — market data, invoices, ledgers</li>
+      <li><code>science</code> — units, statistics, computation</li>
+      <li><code>networking</code> — DNS, IP, packet diagnostics</li>
+    </ul>
+  </section>
+
+  <section class="step-section">
+    <h2><span class="num">03</span>The full template</h2>
+    <p>Save this as <code>manifests/&lt;category&gt;/&lt;your-tool&gt;.json</code> and edit the fields.</p>
+
+<pre><code>{
+  <span class="k">"name"</span>: <span class="s">"video-to-gif"</span>,
+  <span class="k">"version"</span>: <span class="s">"1.0.0"</span>,
+  <span class="k">"category"</span>: <span class="s">"media"</span>,
+  <span class="k">"description"</span>: <span class="s">"Convert a video file to an animated GIF with configurable framerate and resolution"</span>,
+
+  <span class="k">"intent_triggers"</span>: [
+    <span class="s">"convert mp4 to gif"</span>,
+    <span class="s">"turn this video into a gif"</span>,
+    <span class="s">"make a short looping animation from this clip"</span>,
+    <span class="s">"export the first 5 seconds of a video as a gif"</span>,
+    <span class="s">"reduce framerate when generating gif"</span>,
+    <span class="s">"把影片轉成 GIF"</span>,
+    <span class="s">"幫我把這段影片做成 gif 動圖"</span>
+  ],
+
+  <span class="k">"input_schema"</span>: {
+    <span class="k">"input"</span>:  { <span class="k">"type"</span>: <span class="s">"string"</span>,  <span class="k">"required"</span>: <span class="n">true</span>,  <span class="k">"description"</span>: <span class="s">"Path to the source video file"</span> },
+    <span class="k">"output"</span>: { <span class="k">"type"</span>: <span class="s">"string"</span>,  <span class="k">"required"</span>: <span class="n">true</span>,  <span class="k">"description"</span>: <span class="s">"Path to write the output GIF"</span> },
+    <span class="k">"fps"</span>:    { <span class="k">"type"</span>: <span class="s">"integer"</span>, <span class="k">"required"</span>: <span class="n">false</span>, <span class="k">"default"</span>: <span class="n">15</span> },
+    <span class="k">"width"</span>:  { <span class="k">"type"</span>: <span class="s">"integer"</span>, <span class="k">"required"</span>: <span class="n">false</span> }
+  },
+
+  <span class="k">"output_schema"</span>: {
+    <span class="k">"format"</span>: <span class="s">"json"</span>,
+    <span class="k">"fields"</span>: [<span class="s">"output_path"</span>, <span class="s">"frame_count"</span>, <span class="s">"file_size_bytes"</span>]
+  },
+
+  <span class="k">"examples"</span>: [
+    {
+      <span class="k">"query"</span>: <span class="s">"convert demo.mp4 to a 10-fps gif"</span>,
+      <span class="k">"params"</span>: { <span class="k">"input"</span>: <span class="s">"demo.mp4"</span>, <span class="k">"output"</span>: <span class="s">"demo.gif"</span>, <span class="k">"fps"</span>: <span class="n">10</span> }
+    }
+  ],
+
+  <span class="k">"error_codes"</span>: {
+    <span class="k">"1"</span>: <span class="s">"Input file not found"</span>,
+    <span class="k">"2"</span>: <span class="s">"ffmpeg not installed"</span>
+  },
+
+  <span class="k">"tags"</span>: [<span class="s">"video"</span>, <span class="s">"gif"</span>, <span class="s">"ffmpeg"</span>]
+}</code></pre>
+  </section>
+
+  <section class="step-section">
+    <h2><span class="num">04</span>Write good intent_triggers</h2>
+    <p>This is the field that decides whether the router finds your tool. Spend time here.</p>
+
+    <h3>Rules</h3>
+    <ul>
+      <li><strong>≥ 5 entries</strong>, ideally 7–10. More is better up to a point.</li>
+      <li><strong>Mix languages.</strong> At least 2 entries in each major language your users speak. Chinese + English is the floor.</li>
+      <li><strong>Vary the phrasing style.</strong> Imperative, declarative, casual — all of them.</li>
+      <li><strong>Cover edge cases.</strong> Mention interesting parameters in some triggers.</li>
+      <li><strong>No near-duplicates.</strong> "convert video to gif" + "change video to gif" wastes a slot.</li>
+    </ul>
+
+    <div class="callout">
+      <strong>Why it matters.</strong>
+      <p style="margin-top:0.6rem;">The router embeds each trigger and uses them for retrieval. Diverse triggers create a fuller semantic region for your tool, making it discoverable from different ways of asking.</p>
+    </div>
+
+    <h3>Anti-patterns</h3>
+    <ul>
+      <li><span class="cross">✗</span> All five triggers are minor variations of the same sentence</li>
+      <li><span class="cross">✗</span> Single language only</li>
+      <li><span class="cross">✗</span> Triggers that overlap heavily with another tool</li>
+      <li><span class="cross">✗</span> Trap words. If your tool is <code>format-fix</code>, don't include "lint"</li>
+    </ul>
+  </section>
+
+  <section class="step-section">
+    <h2><span class="num">05</span>Write at least one example</h2>
+    <p>An example is a (query, params) pair the router uses as a template.</p>
+
+<pre><code>{
+  <span class="k">"query"</span>: <span class="s">"convert demo.mp4 to a 10-fps gif"</span>,
+  <span class="k">"params"</span>: { <span class="k">"input"</span>: <span class="s">"demo.mp4"</span>, <span class="k">"output"</span>: <span class="s">"demo.gif"</span>, <span class="k">"fps"</span>: <span class="n">10</span> }
+}</code></pre>
+
+    <p>
+      When an agent's intent is similar enough (cosine ≥ 0.85), the router fills your example's
+      <code>params</code> directly without calling an LLM. This is "Path A" — zero LLM tokens.
+    </p>
+
+    <div class="callout">
+      <strong>Aim for 3–5 examples per tool.</strong>
+      <p style="margin-top:0.6rem;">Each example covers a different use shape (default params, common override, edge case). More examples = more A-path hits = lower agent cost.</p>
+    </div>
+  </section>
+
+  <section class="step-section">
+    <h2><span class="num">06</span>Validate locally</h2>
+
+<pre><code><span class="c"># Install the router (also gives you the build CLI)</span>
+pip install clibrary-hub
+
+<span class="c"># Build FAISS indices including your new manifest</span>
+clibrary-build-index --manifest-dir ./manifests
+
+<span class="c"># Try routing some intents</span>
+python -c "from clibrary_hub import CLIbrary; r = CLIbrary(); print(r.route('make a gif from demo.mp4'))"</code></pre>
+
+    <p>If the router doesn't pick your tool for an obvious intent, your <code>intent_triggers</code> probably need more variety or stronger keyword anchors.</p>
+  </section>
+
+  <section class="step-section">
+    <h2><span class="num">07</span>Open a PR</h2>
+    <ol>
+      <li>Fork <a href="https://github.com/clibrary-hub/manifests" style="color:var(--accent);">clibrary-hub/manifests</a></li>
+      <li>Create a branch, commit your manifest under the right category folder</li>
+      <li>Open a PR. Briefly explain what the tool does and why an agent would want it</li>
+      <li>The CI validates schema and checks for duplicate names</li>
+    </ol>
+  </section>
+
+  <section class="step-section">
+    <h2>Common mistakes</h2>
+    <table>
+      <thead><tr><th>Mistake</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Description longer than 200 chars or marketing-speak</td>
+          <td>One sentence, plain. State what it does, not why it's good.</td>
+        </tr>
+        <tr>
+          <td>Only English triggers</td>
+          <td>Add at least 2 entries in any other language your users use.</td>
+        </tr>
+        <tr>
+          <td>Examples without working <code>params</code></td>
+          <td>Run the example yourself before submitting.</td>
+        </tr>
+        <tr>
+          <td>Generic <code>error_codes</code> ("1: error")</td>
+          <td>Be specific. <code>"1": "Input file not found"</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warn">
+      <strong>Don't fake numbers.</strong>
+      <p style="margin-top:0.6rem;">If your tool doesn't actually return <code>frame_count</code>, don't put it in <code>output_schema.fields</code>. The agent will trust it.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>
+    <a href="/">Home</a>
+    &nbsp;·&nbsp;
+    <a href="/benchmark.html">Benchmark</a>
+    &nbsp;·&nbsp;
+    <a href="/zh/create.html">中文版</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/manifests">Manifests on GitHub</a>
+    &nbsp;·&nbsp;
+    MIT License
+  </p>
+</footer>
+
+</body>
+</html>
