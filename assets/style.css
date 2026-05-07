@@ -193,7 +193,7 @@ body::after {
 }
 
 /* ============================================================
-   Nav
+   Nav — minimal, logo-led
    ============================================================ */
 nav {
   position: fixed;
@@ -202,19 +202,19 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 2rem;
-  background: rgba(6, 10, 15, 0.85);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 2.5rem;
+  background: rgba(6, 10, 15, 0.78);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid rgba(30, 42, 53, 0.55);
 }
 
 .logo {
   font-family: var(--mono);
-  font-size: 2.4rem;
+  font-size: 3rem;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
   line-height: 1;
 }
 .logo a {
@@ -225,32 +225,54 @@ nav {
 .logo a:hover { opacity: 0.85; }
 .logo span {
   color: var(--accent);
-  text-shadow: 0 0 18px rgba(0, 229, 160, 0.6);
+  text-shadow: 0 0 20px rgba(0, 229, 160, 0.65);
 }
-@media (max-width: 720px) {
-  .logo { font-size: 1.4rem; }
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
 }
 
 nav a {
   font-family: var(--mono);
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--muted);
   text-decoration: none;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   transition: color 0.2s;
 }
 nav a:hover { color: var(--accent); }
-.nav-links { display: flex; gap: 1.75rem; align-items: center; }
+
+.nav-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  margin: 0 0.25rem;
+}
 
 .nav-cta {
   background: var(--accent-dim);
   border: 1px solid var(--accent);
   color: var(--accent) !important;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.1rem;
   border-radius: 4px;
+  font-size: 0.82rem;
+}
+.nav-cta:hover {
+  background: rgba(0, 229, 160, 0.12);
+  box-shadow: 0 0 18px rgba(0, 229, 160, 0.18);
 }
 
 .lang-active { color: var(--accent) !important; }
+
+@media (max-width: 720px) {
+  nav { padding: 0.55rem 1rem; }
+  .logo { font-size: 1.6rem; }
+  .nav-links { gap: 0.9rem; }
+  .nav-divider { display: none; }
+  nav a:not(.nav-cta):not(.lang-trigger) { display: none; }
+}
 
 /* Language dropdown */
 .lang-switch {
