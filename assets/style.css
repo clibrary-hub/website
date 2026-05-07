@@ -269,16 +269,21 @@ nav a:hover { color: var(--accent); }
 @media (max-width: 720px) {
   nav {
     padding: 0.5rem 1rem;
-    flex-wrap: wrap;     /* let nav-links wrap below logo if needed */
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    justify-content: flex-start;
   }
-  .logo { font-size: 1.6rem; }
-  .nav-links { gap: 0.7rem; flex-wrap: wrap; }
+  .logo { font-size: 1.5rem; flex: 0 0 auto; }
+  .nav-links {
+    flex: 1 1 100%;
+    gap: 0.6rem 0.85rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
   .nav-divider { display: none; }
   nav a { font-size: 0.78rem; }
-}
-@media (max-width: 460px) {
-  /* Very small screens: hide secondary page links to keep nav usable */
-  nav a:not(.nav-cta):not(.lang-trigger) { display: none; }
+  .nav-cta { padding: 0.4rem 0.85rem; }
+  .lang-trigger { padding: 0.35rem 0.65rem; }
 }
 
 /* Language dropdown */
