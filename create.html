@@ -193,7 +193,7 @@ pip install clibrary-hub
 clibrary-build-index --manifest-dir ./manifests
 
 <span class="c"># Try routing some intents</span>
-python -c "from clibrary_hub import CLIbrary; r = CLIbrary(); print(r.route('make a gif from demo.mp4'))"</code></pre>
+python -c "from clibrary_hub import router; print(router.route('make a gif from demo.mp4'))"</code></pre>
 
     <p>If the router doesn't pick your tool for an obvious intent, your <code>intent_triggers</code> probably need more variety or stronger keyword anchors.</p>
   </section>

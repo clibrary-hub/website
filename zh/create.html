@@ -192,7 +192,7 @@ pip install clibrary-hub
 clibrary-build-index --manifest-dir ./manifests
 
 <span class="c"># 試幾個自然語言意圖看看 router 選不選得到</span>
-python -c "from clibrary_hub import CLIbrary; r=CLIbrary(); print(r.route('幫我把 demo.mp4 做成 gif'))"</code></pre>
+python -c "from clibrary_hub import router; print(router.route('幫我把 demo.mp4 做成 gif'))"</code></pre>
 
     <p>如果一個明顯的意圖 router 沒選到你的工具，多半是 <code>intent_triggers</code> 多樣性不夠，或關鍵詞錨點太弱</p>
   </section>
