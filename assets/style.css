@@ -802,15 +802,15 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
 .t-muted  { color: var(--muted); }
 .t-note   { color: #6b7280; font-style: italic; }
 
-/* Blinking cursor at the very end of the screen */
-#term-screen::after {
-  content: '';
+/* Blinking caret on the line currently being typed.
+   Removed when that line finishes; appears on the next line. */
+.t-caret {
   display: inline-block;
   width: 8px;
   height: 1em;
   background: var(--accent);
   vertical-align: text-bottom;
-  margin-left: 2px;
+  margin-left: 1px;
   animation: termBlink 1s steps(1, end) infinite;
 }
 @keyframes termBlink {

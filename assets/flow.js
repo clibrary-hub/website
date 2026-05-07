@@ -175,7 +175,6 @@
       .replaceAll('<g>', '<span class="t-good">').replaceAll('</g>', '</span>')
       .replaceAll('<m>', '<span class="t-muted">').replaceAll('</m>', '</span>');
   }
-  function escape(s) { return s.replaceAll('<', '&lt;').replaceAll('>', '&gt;'); }
   function delay(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
   function makeRunner(screen) {
@@ -192,12 +191,23 @@
       return div;
     }
 
+    // Type into a fresh line: prefix is HTML (the >>> / ... part),
+    // each character of `text` is appended as a real text node so we
+    // never rewrite the line. Smooth, no flicker.
     async function typeLine(prefix, text) {
       const line = append(prefix);
-      for (let i = 0; i < text.length; i++) {
-        line.innerHTML = prefix + escape(text.slice(0, i + 1));
+      const cursor = document.createElement('span');
+      cursor.className = 't-caret';
+      line.appendChild(cursor);
+
+      for (const ch of text) {
+        if (!running) return;
+        line.insertBefore(document.createTextNode(ch), cursor);
+        screen.scrollTop = screen.scrollHeight;
         await delay(CHAR_DELAY + (Math.random() < 0.07 ? 90 : 0));
       }
+      // Done with this line — drop the inline caret (the global one keeps blinking).
+      cursor.remove();
     }
 
     async function play() {
