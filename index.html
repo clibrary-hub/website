@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLIbrary-Hub — Tool Routing for AI Agents</title>
+<meta name="description" content="Open-source two-stage CLI router for AI agents. ~36ms latency, ~150 tokens, multilingual. pip install clibrary-hub.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080c10;
+    --surface: #0e1419;
+    --border: #1e2a35;
+    --accent: #00e5a0;
+    --accent-dim: #00e5a020;
+    --text: #e8edf2;
+    --muted: #5a7080;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    background: rgba(8,12,16,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .logo span { color: var(--accent); }
+
+  nav a {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+
+  nav a:hover { color: var(--accent); }
+
+  .nav-links { display: flex; gap: 2rem; align-items: center; }
+
+  .nav-cta {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    color: var(--accent) !important;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+  }
+
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    background: var(--accent-dim);
+    padding: 0.35rem 0.75rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    letter-spacing: 0.08em;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.4s forwards;
+  }
+
+  h1 .accent { color: var(--accent); }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--muted);
+    max-width: 620px;
+    font-weight: 300;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.6s forwards;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 2.5rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.7s forwards;
+  }
+
+  .stat { text-align: center; }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .install-box {
+    opacity: 0;
+    animation: fadeUp 0.6s 0.8s forwards;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .install-cmd {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    padding: 0.95rem 1.2rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .install-cmd:hover { border-color: var(--accent); }
+
+  .install-cmd .prompt { color: var(--accent); user-select: none; }
+  .install-cmd .cmd { flex: 1; text-align: left; }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .install-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.8rem;
+    text-align: center;
+    font-family: var(--mono);
+  }
+
+  .install-note a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .terminal-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto 6rem;
+    padding: 0 2rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 1s forwards;
+  }
+
+  .terminal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+  }
+
+  .terminal-bar {
+    background: #141c24;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+
+  .terminal-title {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .terminal-body { padding: 1.5rem; line-height: 2; overflow-x: auto; }
+
+  .line-prompt { color: var(--accent); }
+  .line-cmd { color: var(--text); }
+  .line-out { color: var(--muted); }
+  .line-key { color: #7dd3fc; }
+  .line-val { color: #86efac; }
+  .line-comment { color: #4b5563; }
+
+  section {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: var(--mono);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 3rem;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.75rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--accent); }
+
+  .card-icon {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-icon::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .card h3 {
+    font-family: var(--mono);
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .card p { font-size: 0.9rem; color: var(--muted); }
+
+  .perf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+  }
+
+  .perf-table th, .perf-table td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .perf-table th {
+    color: var(--muted);
+    font-weight: normal;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .perf-table td.num { color: var(--accent); text-align: right; }
+  .perf-table td.muted { color: var(--muted); }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .cat {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .cat:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+
+  .compare-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.75rem;
+  }
+
+  .compare-card.highlight { border-color: var(--accent); }
+
+  .compare-card h3 {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .compare-card.highlight h3 { color: var(--accent); }
+
+  .compare-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+
+  .compare-row:last-child { border-bottom: none; }
+
+  .compare-row span:last-child {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+  }
+
+  .good { color: var(--accent); }
+  .bad { color: #f87171; }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">CLIbrary<span>-Hub</span></div>
+  <div class="nav-links">
+    <a href="https://github.com/clibrary-hub/CLIbrary">GitHub</a>
+    <a href="#how">How it works</a>
+    <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">v0.1.1 — NOW ON PYPI</div>
+
+  <h1>Tool routing for<br><span class="accent">AI agents</span>.</h1>
+
+  <p class="hero-sub">
+    Two-stage embedding router that picks the right CLI from hundreds of tools
+    in ~36 ms with ~150 tokens. Open source, multilingual, no fine-tuning required.
+  </p>
+
+  <div class="stats-row">
+    <div class="stat">
+      <span class="stat-num">~36ms</span>
+      <span class="stat-label">P50 LATENCY</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">TOP-3 ON ADVERSARIAL</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">~150</span>
+      <span class="stat-label">TOKENS / CALL</span>
+    </div>
+  </div>
+
+  <div class="install-box">
+    <div class="install-cmd">
+      <span class="prompt">$</span>
+      <span class="cmd" id="install-cmd-text">pip install clibrary-hub</span>
+      <button class="copy-btn" onclick="copyInstall()" id="copy-btn">COPY</button>
+    </div>
+    <p class="install-note">
+      Source on
+      <a href="https://github.com/clibrary-hub/CLIbrary">GitHub</a>
+      · MIT licensed · Python 3.10+
+    </p>
+  </div>
+</div>
+
+<div class="terminal-wrap" id="how">
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="terminal-title">clibrary_hub — Python</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="line-comment"># Build the FAISS indices once from your manifests</span></div>
+      <div><span class="line-prompt">$ </span><span class="line-cmd">clibrary-build-index --manifest-dir ./manifests</span></div>
+      <br>
+      <div><span class="line-comment"># Then route any natural-language intent</span></div>
+      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">from clibrary_hub import CLIbrary</span></div>
+      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">router = CLIbrary()</span></div>
+      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">router.route("查上週銷售總額")</span></div>
+      <br>
+      <div><span class="line-out">{</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"action"</span><span class="line-out">: </span><span class="line-val">"route"</span><span class="line-out">,</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"cli"</span><span class="line-out">: </span><span class="line-val">"sql-runner"</span><span class="line-out">,</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"params"</span><span class="line-out">: {</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="line-key">"query"</span><span class="line-out">: </span><span class="line-val">"SELECT SUM(amount) FROM orders WHERE created_at &gt; NOW() - INTERVAL 7 DAY"</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;},</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"confidence"</span><span class="line-out">: </span><span class="line-val">0.94</span><span class="line-out">,</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"source"</span><span class="line-out">: </span><span class="line-val">"A"</span><span class="line-out">,&nbsp;&nbsp;</span><span class="line-comment"># template fill, no LLM call</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"latency_ms"</span><span class="line-out">: </span><span class="line-val">36</span></div>
+      <div><span class="line-out">}</span></div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<section>
+  <p class="section-label">WHY EMBEDDING ROUTING</p>
+  <h2 class="section-title">Stuffing tools<br>into prompts breaks at scale.</h2>
+  <p class="section-sub">When an agent has 100+ tools, the LLM has to read every description before picking one. Token cost, latency, and accuracy all degrade.</p>
+
+  <div class="compare">
+    <div class="compare-card">
+      <h3>STUFF ALL TOOLS IN PROMPT</h3>
+      <div class="compare-row"><span>Tokens per call</span><span class="bad">3,000–50,000</span></div>
+      <div class="compare-row"><span>Latency</span><span class="bad">2–5 s</span></div>
+      <div class="compare-row"><span>Accuracy at 500 tools</span><span class="bad">~60–70%</span></div>
+      <div class="compare-row"><span>Cost scales with</span><span class="bad">tool count</span></div>
+    </div>
+    <div class="compare-card highlight">
+      <h3>CLIBRARY-HUB ROUTING</h3>
+      <div class="compare-row"><span>Tokens per call</span><span class="good">~150 (fixed)</span></div>
+      <div class="compare-row"><span>Latency</span><span class="good">~36 ms</span></div>
+      <div class="compare-row"><span>Accuracy at 500 tools</span><span class="good">82–92% top-1</span></div>
+      <div class="compare-row"><span>Cost scales with</span><span class="good">flat</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section>
+  <p class="section-label">PERFORMANCE</p>
+  <h2 class="section-title">Measured, not promised.</h2>
+  <p class="section-sub">Evaluated against 2,050 queries spanning 559 CLI tools (CLIbrary + MCP). Numbers are from the latest router build (clibrary_top3 strategy, multilingual-e5-base).</p>
+
+  <table class="perf-table">
+    <thead>
+      <tr>
+        <th>EVAL SET</th>
+        <th>SIZE</th>
+        <th class="num">TOP-1</th>
+        <th class="num">TOP-3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>in_domain</td>
+        <td class="muted">500</td>
+        <td class="num">91%</td>
+        <td class="num">95%</td>
+      </tr>
+      <tr>
+        <td>paraphrase</td>
+        <td class="muted">1,500</td>
+        <td class="num">81.8%</td>
+        <td class="num">83.4%</td>
+      </tr>
+      <tr>
+        <td>adversarial</td>
+        <td class="muted">204</td>
+        <td class="num">86.3%</td>
+        <td class="num">100%</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="install-note" style="text-align:left; margin-top:1.5rem;">
+    Adversarial set hardened by 3 rounds of intent-trigger patching.
+    No model fine-tuning involved.
+  </p>
+</section>
+
+<hr class="divider">
+
+<section>
+  <p class="section-label">HOW IT WORKS</p>
+  <h2 class="section-title">Two stages,<br>three indices.</h2>
+  <p class="section-sub">Stage 1 retrieves candidate CLIs via FAISS. Stage 2 matches the closest example template. ~80% of queries skip the LLM entirely.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">STAGE 1 · CLI INDEX</div>
+      <h3>Mean-pooled candidate retrieval</h3>
+      <p>Each CLI's intent_triggers are embedded and mean-pooled into a single vector. FAISS returns top-3 candidates. Re-ranked using MaxSim over the trigger_index.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">STAGE 2 · EXAMPLE INDEX</div>
+      <h3>Template matching with A/B split</h3>
+      <p>Find the closest example.query within the winning CLI. If similarity ≥ 0.85, fill the template (Path A — no LLM). Else, ask a small LLM to extract params (Path B).</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">CLARIFY GATE</div>
+      <h3>Ask, don't guess</h3>
+      <p>If top-1 confidence is low and the gap to top-2 is small, return all three candidates and let the agent ask the user. Reduces silent mis-routes to near zero.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section>
+  <p class="section-label">MANIFESTS</p>
+  <h2 class="section-title">Every CLI as<br>a single JSON file.</h2>
+  <p class="section-sub">A manifest describes one tool: what it does, when to use it, what it expects, and what it returns. Manifests live in their own MIT-licensed registry.</p>
+
+  <div class="categories">
+    <div class="cat">ai-ml</div>
+    <div class="cat">devops</div>
+    <div class="cat">data</div>
+    <div class="cat">web</div>
+    <div class="cat">security</div>
+    <div class="cat">media</div>
+    <div class="cat">productivity</div>
+    <div class="cat">finance</div>
+    <div class="cat">science</div>
+    <div class="cat">networking</div>
+  </div>
+
+  <p class="install-note" style="text-align:left; margin-top:2rem;">
+    Browse the registry on
+    <a href="https://github.com/clibrary-hub/manifests">GitHub</a>
+    — PRs welcome.
+  </p>
+</section>
+
+<footer>
+  <p>
+    <a href="https://pypi.org/project/clibrary-hub/">PyPI</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/CLIbrary">Router (GitHub)</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/manifests">Manifests (GitHub)</a>
+    &nbsp;·&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+  function copyInstall() {
+    const text = document.getElementById('install-cmd-text').textContent;
+    const btn = document.getElementById('copy-btn');
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'COPIED';
+      btn.style.color = '#00e5a0';
+      btn.style.borderColor = '#00e5a0';
+      setTimeout(() => {
+        btn.textContent = 'COPY';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 1500);
+    });
+  }
+</script>
+
+</body>
+</html>
