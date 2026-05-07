@@ -85,16 +85,38 @@
 <section class="flow-wrap" id="flow">
   <p class="section-label">LIVE DEMO</p>
   <h2>What you type. <span>What comes back.</span></h2>
-  <p class="section-sub">A real Python session — typed in front of you, looped on this page. The same flow a human or an agent goes through.</p>
+  <p class="section-sub">Two real Python sessions, looped on this page. Same library, two ways to drive it.</p>
 
-  <div class="term-window">
-    <div class="term-bar">
-      <div class="dot dot-r"></div>
-      <div class="dot dot-y"></div>
-      <div class="dot dot-g"></div>
-      <span class="term-title">user@laptop ~ · python</span>
+  <div class="flow-dual">
+
+    <div class="flow-col">
+      <div class="flow-col-label">HUMAN · ONE-SHOT</div>
+      <p class="flow-col-tagline">You ask, the router answers, you run the command. Done.</p>
+      <div class="term-window">
+        <div class="term-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="term-title">user@laptop · python</span>
+        </div>
+        <div class="term-screen" data-seq="human" data-lang="en"></div>
+      </div>
     </div>
-    <div id="term-screen"></div>
+
+    <div class="flow-col agent">
+      <div class="flow-col-label">LLM AGENT · WITH CLARIFY</div>
+      <p class="flow-col-tagline">When the intent is vague the router returns top-3 candidates. The LLM picks one and the agent runs it.</p>
+      <div class="term-window">
+        <div class="term-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="term-title">agent-runtime · python</span>
+        </div>
+        <div class="term-screen" data-seq="agent" data-lang="en"></div>
+      </div>
+    </div>
+
   </div>
 </section>
 
