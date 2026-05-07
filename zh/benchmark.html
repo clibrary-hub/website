@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>效能評測 — CLIbrary-Hub</title>
+<meta name="description" content="路由完整效能評測：in_domain、paraphrase、adversarial 三組評測集，qwen2.5:3b 和 14b 雙模型對照。559 工具，2,050 筆 query。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+<script src="/assets/parallax.js" defer></script>
+</head>
+<body>
+
+<svg class="bg-network" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 1920 1080">
+  <line class="conn"       x1="150"  y1="130" x2="1500" y2="240" />
+  <line class="conn"       x1="270"  y1="520" x2="1690" y2="700" />
+  <line class="conn"       x1="420"  y1="890" x2="1760" y2="380" />
+  <line class="conn-pulse" x1="150"  y1="130" x2="270"  y2="520" />
+  <line class="conn-pulse" x1="1500" y1="240" x2="1690" y2="700" />
+</svg>
+
+<div class="bg-nodes">
+  <span class="node"></span><span class="node"></span><span class="node"></span><span class="node"></span>
+  <span class="node"></span><span class="node"></span><span class="node"></span><span class="node"></span>
+</div>
+
+<nav>
+  <div class="logo"><a href="/zh/">CLIbrary<span>-Hub</span></a></div>
+  <div class="nav-links">
+    <a href="/zh/benchmark.html" class="lang-active">效能評測</a>
+    <a href="/zh/create.html">寫一個 Manifest</a>
+    <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
+    <div class="lang-switch" id="lang-switch">
+      <button class="lang-trigger" onclick="toggleLang(event)">中文 <span class="caret">▾</span></button>
+      <div class="lang-menu">
+        <a href="/benchmark.html">English</a>
+        <a href="/zh/benchmark.html" class="current">繁體中文</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <div class="hero-block">
+    <p class="section-label">效能評測</p>
+    <h1>559 工具下的<br><span>路由準確率</span>。</h1>
+    <p class="lead">
+      三組評測集、兩種模型大小。同一個 router、同一份 FAISS 索引、同一批 manifests。
+      下面數字來自最新 router build（multilingual-e5-base，RERANK_ALPHA=0.7）。
+    </p>
+  </div>
+
+  <section class="step-section">
+    <h2>實驗設定</h2>
+    <ul>
+      <li><strong>工具池：</strong>559（CLIbrary 499 + MCP 60）</li>
+      <li><strong>Embedding 模型：</strong><code>intfloat/multilingual-e5-base</code>（768 維）</li>
+      <li><strong>策略：</strong><code>clibrary</code> — FAISS top-1 → 用小 LLM 抽參數（或 A 路套模板）</li>
+      <li><strong>後端：</strong>Ollama 本地（qwen2.5:3b、qwen2.5:14b）</li>
+      <li><strong>Manifests：</strong>504 個，intent_triggers 經過 3 輪修補</li>
+    </ul>
+  </section>
+
+  <section class="step-section">
+    <h2>核心發現</h2>
+    <p>
+      只要 routing 由 embedding-based router 處理，<strong>模型大小就變得不重要</strong>。
+      qwen2.5:3b 和 qwen2.5:14b 在 1,500 筆 paraphrase 評測上的 CLI 準確率幾乎完全一樣。
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>模型</th><th>評測</th><th>樣本</th>
+          <th class="num">CLI 準確</th><th class="num">Top-3</th>
+          <th class="num">Pick</th><th class="num">參數</th><th class="num">E2E</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>qwen2.5:3b</td><td>paraphrase</td><td class="muted">1,500</td>
+          <td class="num">81.80%</td><td class="num">83.40%</td><td class="num">98.08%</td>
+          <td class="num">69.00%</td><td class="num">61.27%</td>
+        </tr>
+        <tr>
+          <td>qwen2.5:14b</td><td>paraphrase</td><td class="muted">1,500</td>
+          <td class="num">81.67%</td><td class="num">83.27%</td><td class="num">98.08%</td>
+          <td class="num">68.87%</td><td class="num">61.20%</td>
+        </tr>
+        <tr>
+          <td class="muted-l">Δ (3b − 14b)</td><td colspan="2"></td>
+          <td class="muted">+0.13pp</td><td class="muted">+0.13pp</td><td class="muted">±0</td>
+          <td class="muted">+0.13pp</td><td class="muted">+0.07pp</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>意涵。</strong>
+      <p style="margin-top:0.6rem;">當 router 扛起檢索責任，把 LLM 從 3B 換到 14B（4.7 倍參數）幾乎沒帶來任何額外準確率。在大模型上花的算力是浪費——把資源放在更好的 <code>intent_triggers</code> 上面。</p>
+    </div>
+  </section>
+
+  <section class="step-section">
+    <h2>Adversarial 評測集</h2>
+    <p>
+      Adversarial 評測共 204 筆，每個 intent 都被刻意設計來誤導 router：
+      表面詞彙指向工具 A，但語意核心是工具 B（intent confusion、false friends、ambiguous scope、negation traps）。
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>階段</th><th class="num">CLI 準確</th><th class="num">Top-3</th><th class="num">FAISS miss</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>原始 FAISS</td><td class="num">58.0%</td><td class="num">78.9%</td><td class="muted">43 / 204</td></tr>
+        <tr><td>+ Trigger Patch R1（10 CLIs）</td><td class="num">73.5%</td><td class="num">88.2%</td><td class="muted">24 / 204</td></tr>
+        <tr><td>+ Trigger Patch R2（23 CLIs）</td><td class="num">83.3%</td><td class="num">97.1%</td><td class="muted">6 / 204</td></tr>
+        <tr class="highlight"><td>+ Trigger Patch R3（4 CLIs）</td><td class="num">86.3%</td><td class="num">100%</td><td class="muted">0 / 204</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>三輪 trigger 修補把 adversarial 變成 100% 召回問題。</strong>
+      <p style="margin-top:0.6rem;">沒做任何模型微調。CLI 準確 86.3% 跟 Top-3 100% 之間剩下的 13.7pp，是 LLM 從 top-3 選錯的部分，不是檢索問題。</p>
+    </div>
+  </section>
+
+  <section class="step-section">
+    <h2>其他評測集（qwen2.5:3b）</h2>
+    <table>
+      <thead>
+        <tr><th>評測</th><th>樣本</th><th class="num">CLI 準確</th><th class="num">Top-3</th><th class="num">E2E</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>in_domain</td><td class="muted">500</td><td class="num">~91%</td><td class="num">~95%</td><td class="num">—</td></tr>
+        <tr><td>paraphrase</td><td class="muted">1,500</td><td class="num">81.80%</td><td class="num">83.40%</td><td class="num">61.27%</td></tr>
+        <tr><td>cross_domain</td><td class="muted">328</td><td class="num">68.9%</td><td class="num">—</td><td class="num">67.7%</td></tr>
+        <tr><td>adversarial（R3 後）</td><td class="muted">204</td><td class="num">86.3%</td><td class="num">100%</td><td class="num">79.9%</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="step-section">
+    <h2>延遲與成本</h2>
+    <p>Router 本身的指標（不含 B 路 LLM call）：</p>
+    <ul>
+      <li><strong>延遲 p50：</strong>36 毫秒</li>
+      <li><strong>延遲 p95：</strong>39 毫秒</li>
+      <li><strong>A 路命中率：</strong>~80% 的 query 完全不呼叫 LLM</li>
+      <li><strong>Token 成本（A 路）：</strong>0 — 純檢索套模板</li>
+      <li><strong>Token 成本（B 路）：</strong>~150 — 與工具數無關，固定值</li>
+    </ul>
+  </section>
+
+  <section class="step-section">
+    <h2>可重現性</h2>
+    <p>
+      Router 已上 PyPI（<code>pip install clibrary-hub</code>）和 GitHub
+      （<a href="https://github.com/clibrary-hub/CLIbrary" style="color:var(--accent);">clibrary-hub/CLIbrary</a>）。
+      Manifests 在 <a href="https://github.com/clibrary-hub/manifests" style="color:var(--accent);">clibrary-hub/manifests</a>。
+      評測集隨 router repo 一起發佈，路徑 <code>benchmark/eval_sets/</code>。
+    </p>
+  </section>
+</main>
+
+<footer>
+  <p>
+    <a href="/zh/">首頁</a>
+    &nbsp;·&nbsp;
+    <a href="https://pypi.org/project/clibrary-hub/">PyPI</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/CLIbrary">Router</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/manifests">Manifests</a>
+    &nbsp;·&nbsp;
+    MIT 授權
+  </p>
+</footer>
+
+<script>
+  function toggleLang(e) {
+    e.stopPropagation();
+    document.getElementById('lang-switch').classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    document.getElementById('lang-switch').classList.remove('open');
+  });
+</script>
+
+</body>
+</html>

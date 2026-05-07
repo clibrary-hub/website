@@ -7,416 +7,163 @@
 <meta name="description" content="Detailed routing benchmark: in_domain, paraphrase, adversarial across qwen2.5:3b and qwen2.5:14b. 559 tools, 2,050 queries.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #080c10;
-    --surface: #0e1419;
-    --border: #1e2a35;
-    --accent: #00e5a0;
-    --accent-dim: #00e5a020;
-    --text: #e8edf2;
-    --muted: #5a7080;
-    --mono: 'Space Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
-  }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.6;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 60px 60px;
-    opacity: 0.4;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 2rem;
-    background: rgba(8,12,16,0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .logo {
-    font-family: var(--mono);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .logo span { color: var(--accent); }
-  .logo a { color: inherit; text-decoration: none; }
-
-  nav a {
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    color: var(--muted);
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: color 0.2s;
-  }
-  nav a:hover { color: var(--accent); }
-  .nav-links { display: flex; gap: 2rem; align-items: center; }
-
-  .nav-cta {
-    background: var(--accent-dim);
-    border: 1px solid var(--accent);
-    color: var(--accent) !important;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-  }
-
-  main {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 8rem 2rem 4rem;
-  }
-
-  h1 {
-    font-family: var(--mono);
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-    margin-bottom: 1rem;
-  }
-  h1 span { color: var(--accent); }
-
-  .lead {
-    color: var(--muted);
-    max-width: 700px;
-    margin-bottom: 3rem;
-    font-size: 1.05rem;
-  }
-
-  h2 {
-    font-family: var(--mono);
-    font-size: 1.4rem;
-    margin-top: 3rem;
-    margin-bottom: 1rem;
-    letter-spacing: -0.01em;
-  }
-
-  h3 {
-    font-family: var(--mono);
-    font-size: 1rem;
-    margin-top: 2rem;
-    margin-bottom: 0.6rem;
-    color: var(--text);
-  }
-
-  p { margin-bottom: 1rem; color: var(--text); }
-
-  .section-label {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--accent);
-    letter-spacing: 0.12em;
-    margin-bottom: 0.5rem;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    margin: 1rem 0 2rem;
-  }
-  th, td {
-    padding: 0.7rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  th {
-    color: var(--muted);
-    font-weight: normal;
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--surface);
-  }
-  td.num { text-align: right; color: var(--accent); }
-  td.muted { color: var(--muted); text-align: right; }
-  td.muted-l { color: var(--muted); }
-  tr.highlight td.num { color: var(--accent); font-weight: bold; }
-
-  .callout {
-    background: var(--accent-dim);
-    border-left: 3px solid var(--accent);
-    padding: 1rem 1.5rem;
-    margin: 1.5rem 0;
-    border-radius: 0 4px 4px 0;
-    font-size: 0.92rem;
-  }
-
-  .callout strong { color: var(--accent); }
-
-  code {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    background: var(--surface);
-    padding: 0.15rem 0.4rem;
-    border-radius: 3px;
-    border: 1px solid var(--border);
-  }
-
-  ul {
-    margin: 0.5rem 0 1.5rem 1.5rem;
-    color: var(--text);
-  }
-
-  ul li {
-    margin-bottom: 0.4rem;
-  }
-
-  hr {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 3rem 0;
-  }
-
-  footer {
-    position: relative;
-    z-index: 1;
-    border-top: 1px solid var(--border);
-    padding: 2rem;
-    text-align: center;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-  footer a { color: var(--muted); text-decoration: none; }
-  footer a:hover { color: var(--accent); }
-</style>
+<link rel="stylesheet" href="/assets/style.css">
+<script src="/assets/parallax.js" defer></script>
 </head>
 <body>
+
+<svg class="bg-network" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 1920 1080">
+  <line class="conn"       x1="150"  y1="130" x2="1500" y2="240" />
+  <line class="conn"       x1="270"  y1="520" x2="1690" y2="700" />
+  <line class="conn"       x1="420"  y1="890" x2="1760" y2="380" />
+  <line class="conn-pulse" x1="150"  y1="130" x2="270"  y2="520" />
+  <line class="conn-pulse" x1="1500" y1="240" x2="1690" y2="700" />
+</svg>
+
+<div class="bg-nodes">
+  <span class="node"></span><span class="node"></span><span class="node"></span><span class="node"></span>
+  <span class="node"></span><span class="node"></span><span class="node"></span><span class="node"></span>
+</div>
 
 <nav>
   <div class="logo"><a href="/">CLIbrary<span>-Hub</span></a></div>
   <div class="nav-links">
-    <a href="/">Home</a>
-    <a href="https://github.com/clibrary-hub/CLIbrary">GitHub</a>
+    <a href="/benchmark.html" class="lang-active">Benchmark</a>
+    <a href="/create.html">Write a Manifest</a>
     <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
+    <div class="lang-switch" id="lang-switch">
+      <button class="lang-trigger" onclick="toggleLang(event)">EN <span class="caret">▾</span></button>
+      <div class="lang-menu">
+        <a href="/benchmark.html" class="current">English</a>
+        <a href="/zh/benchmark.html">繁體中文</a>
+      </div>
+    </div>
   </div>
 </nav>
 
 <main>
-  <p class="section-label">BENCHMARK</p>
-  <h1>Routing accuracy<br>at <span>559 tools</span>.</h1>
-  <p class="lead">
-    Three eval sets, two model sizes. Same router, same FAISS indices, same manifests.
-    The numbers below are from the latest router build (multilingual-e5-base, RERANK_ALPHA=0.7).
-  </p>
-
-  <h2>Setup</h2>
-  <ul>
-    <li><strong>Tool pool:</strong> 559 (CLIbrary 499 + MCP 60)</li>
-    <li><strong>Embedding model:</strong> <code>intfloat/multilingual-e5-base</code> (768-d)</li>
-    <li><strong>Strategy:</strong> <code>clibrary</code> — FAISS top-1 → params via small LLM (or template fill on Path A)</li>
-    <li><strong>Backends:</strong> Ollama local (qwen2.5:3b, qwen2.5:14b)</li>
-    <li><strong>Manifests:</strong> 504 in registry, intent_triggers patched 3 rounds</li>
-  </ul>
-
-  <hr>
-
-  <h2>Headline result</h2>
-  <p>
-    Once routing is done by an embedding-based router, model size <strong>stops mattering</strong>.
-    qwen2.5:3b and qwen2.5:14b achieve essentially identical CLI Acc on the 1,500-query paraphrase set.
-  </p>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Model</th>
-        <th>Eval</th>
-        <th>N</th>
-        <th>CLI Acc</th>
-        <th>Top-3 Acc</th>
-        <th>Top-3 Pick</th>
-        <th>Params Acc</th>
-        <th>E2E Acc</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>qwen2.5:3b</td>
-        <td>paraphrase</td>
-        <td class="muted">1,500</td>
-        <td class="num">81.80%</td>
-        <td class="num">83.40%</td>
-        <td class="num">98.08%</td>
-        <td class="num">69.00%</td>
-        <td class="num">61.27%</td>
-      </tr>
-      <tr>
-        <td>qwen2.5:14b</td>
-        <td>paraphrase</td>
-        <td class="muted">1,500</td>
-        <td class="num">81.67%</td>
-        <td class="num">83.27%</td>
-        <td class="num">98.08%</td>
-        <td class="num">68.87%</td>
-        <td class="num">61.20%</td>
-      </tr>
-      <tr>
-        <td class="muted-l">Δ (3b − 14b)</td>
-        <td colspan="2"></td>
-        <td class="muted">+0.13pp</td>
-        <td class="muted">+0.13pp</td>
-        <td class="muted">±0</td>
-        <td class="muted">+0.13pp</td>
-        <td class="muted">+0.07pp</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="callout">
-    <strong>Implication.</strong> When the router does the heavy lifting, scaling the LLM from 3B to 14B (4.7×) gives you essentially zero additional accuracy.
-    Compute spent on a bigger model is wasted — spend it on better <code>intent_triggers</code> instead.
+  <div class="hero-block">
+    <p class="section-label">Benchmark</p>
+    <h1>Routing accuracy<br>at <span>559 tools</span>.</h1>
+    <p class="lead">
+      Three eval sets, two model sizes. Same router, same FAISS indices, same manifests.
+      The numbers below are from the latest router build (multilingual-e5-base, RERANK_ALPHA=0.7).
+    </p>
   </div>
 
-  <hr>
+  <section class="step-section">
+    <h2>Setup</h2>
+    <ul>
+      <li><strong>Tool pool:</strong> 559 (CLIbrary 499 + MCP 60)</li>
+      <li><strong>Embedding model:</strong> <code>intfloat/multilingual-e5-base</code> (768-d)</li>
+      <li><strong>Strategy:</strong> <code>clibrary</code> — FAISS top-1 → params via small LLM (or template fill on Path A)</li>
+      <li><strong>Backends:</strong> Ollama local (qwen2.5:3b, qwen2.5:14b)</li>
+      <li><strong>Manifests:</strong> 504 in registry, intent_triggers patched 3 rounds</li>
+    </ul>
+  </section>
 
-  <h2>Adversarial set</h2>
-  <p>
-    The adversarial eval contains 204 intents engineered to mislead the router:
-    surface-level keywords pointing to tool A while the semantic core is tool B
-    (intent confusion, false friends, ambiguous scope, negation traps).
-  </p>
+  <section class="step-section">
+    <h2>Headline result</h2>
+    <p>
+      Once routing is done by an embedding-based router, model size <strong>stops mattering</strong>.
+      qwen2.5:3b and qwen2.5:14b achieve essentially identical CLI Acc on the 1,500-query paraphrase set.
+    </p>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Stage</th>
-        <th>CLI Acc</th>
-        <th>Top-3 Acc</th>
-        <th>FAISS miss</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Original FAISS</td>
-        <td class="num">58.0%</td>
-        <td class="num">78.9%</td>
-        <td class="muted">43 / 204</td>
-      </tr>
-      <tr>
-        <td>+ trigger patch R1 (10 CLIs)</td>
-        <td class="num">73.5%</td>
-        <td class="num">88.2%</td>
-        <td class="muted">24 / 204</td>
-      </tr>
-      <tr>
-        <td>+ trigger patch R2 (23 CLIs)</td>
-        <td class="num">83.3%</td>
-        <td class="num">97.1%</td>
-        <td class="muted">6 / 204</td>
-      </tr>
-      <tr class="highlight">
-        <td>+ trigger patch R3 (4 CLIs)</td>
-        <td class="num">86.3%</td>
-        <td class="num">100%</td>
-        <td class="muted">0 / 204</td>
-      </tr>
-    </tbody>
-  </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th><th>Eval</th><th>N</th>
+          <th class="num">CLI Acc</th><th class="num">Top-3</th>
+          <th class="num">Pick</th><th class="num">Params</th><th class="num">E2E</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>qwen2.5:3b</td><td>paraphrase</td><td class="muted">1,500</td>
+          <td class="num">81.80%</td><td class="num">83.40%</td><td class="num">98.08%</td>
+          <td class="num">69.00%</td><td class="num">61.27%</td>
+        </tr>
+        <tr>
+          <td>qwen2.5:14b</td><td>paraphrase</td><td class="muted">1,500</td>
+          <td class="num">81.67%</td><td class="num">83.27%</td><td class="num">98.08%</td>
+          <td class="num">68.87%</td><td class="num">61.20%</td>
+        </tr>
+        <tr>
+          <td class="muted-l">Δ (3b − 14b)</td><td colspan="2"></td>
+          <td class="muted">+0.13pp</td><td class="muted">+0.13pp</td><td class="muted">±0</td>
+          <td class="muted">+0.13pp</td><td class="muted">+0.07pp</td>
+        </tr>
+      </tbody>
+    </table>
 
-  <div class="callout">
-    <strong>3 rounds of trigger patching turned the adversarial set into a perfect-recall problem.</strong>
-    No model fine-tuning. The remaining 13.7pp gap between CLI Acc and Top-3 Acc is
-    LLM selection error, not retrieval error.
-  </div>
+    <div class="callout">
+      <strong>Implication.</strong>
+      <p style="margin-top:0.6rem;">When the router does the heavy lifting, scaling the LLM from 3B to 14B (4.7×) gives essentially zero additional accuracy. Compute spent on a bigger model is wasted — spend it on better <code>intent_triggers</code> instead.</p>
+    </div>
+  </section>
 
-  <hr>
+  <section class="step-section">
+    <h2>Adversarial set</h2>
+    <p>
+      The adversarial eval contains 204 intents engineered to mislead the router:
+      surface-level keywords pointing to tool A while the semantic core is tool B
+      (intent confusion, false friends, ambiguous scope, negation traps).
+    </p>
 
-  <h2>Other eval sets (qwen2.5:3b)</h2>
+    <table>
+      <thead>
+        <tr><th>Stage</th><th class="num">CLI Acc</th><th class="num">Top-3</th><th class="num">FAISS miss</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Original FAISS</td><td class="num">58.0%</td><td class="num">78.9%</td><td class="muted">43 / 204</td></tr>
+        <tr><td>+ trigger patch R1 (10 CLIs)</td><td class="num">73.5%</td><td class="num">88.2%</td><td class="muted">24 / 204</td></tr>
+        <tr><td>+ trigger patch R2 (23 CLIs)</td><td class="num">83.3%</td><td class="num">97.1%</td><td class="muted">6 / 204</td></tr>
+        <tr class="highlight"><td>+ trigger patch R3 (4 CLIs)</td><td class="num">86.3%</td><td class="num">100%</td><td class="muted">0 / 204</td></tr>
+      </tbody>
+    </table>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Eval</th>
-        <th>N</th>
-        <th>CLI Acc</th>
-        <th>Top-3 Acc</th>
-        <th>E2E Acc</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>in_domain</td>
-        <td class="muted">500</td>
-        <td class="num">~91%</td>
-        <td class="num">~95%</td>
-        <td class="num">—</td>
-      </tr>
-      <tr>
-        <td>paraphrase</td>
-        <td class="muted">1,500</td>
-        <td class="num">81.80%</td>
-        <td class="num">83.40%</td>
-        <td class="num">61.27%</td>
-      </tr>
-      <tr>
-        <td>cross_domain</td>
-        <td class="muted">328</td>
-        <td class="num">68.9%</td>
-        <td class="num">—</td>
-        <td class="num">67.7%</td>
-      </tr>
-      <tr>
-        <td>adversarial (post R3)</td>
-        <td class="muted">204</td>
-        <td class="num">86.3%</td>
-        <td class="num">100%</td>
-        <td class="num">79.9%</td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="callout">
+      <strong>3 rounds of trigger patching turned the adversarial set into a perfect-recall problem.</strong>
+      <p style="margin-top:0.6rem;">No model fine-tuning. The remaining 13.7pp gap between CLI Acc and Top-3 Acc is LLM selection error, not retrieval error.</p>
+    </div>
+  </section>
 
-  <hr>
+  <section class="step-section">
+    <h2>Other eval sets (qwen2.5:3b)</h2>
+    <table>
+      <thead>
+        <tr><th>Eval</th><th>N</th><th class="num">CLI Acc</th><th class="num">Top-3</th><th class="num">E2E</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>in_domain</td><td class="muted">500</td><td class="num">~91%</td><td class="num">~95%</td><td class="num">—</td></tr>
+        <tr><td>paraphrase</td><td class="muted">1,500</td><td class="num">81.80%</td><td class="num">83.40%</td><td class="num">61.27%</td></tr>
+        <tr><td>cross_domain</td><td class="muted">328</td><td class="num">68.9%</td><td class="num">—</td><td class="num">67.7%</td></tr>
+        <tr><td>adversarial (post R3)</td><td class="muted">204</td><td class="num">86.3%</td><td class="num">100%</td><td class="num">79.9%</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-  <h2>Latency &amp; cost</h2>
-  <p>Router-only metrics (does not include LLM call on Path B):</p>
-  <ul>
-    <li><strong>Latency p50:</strong> 36 ms</li>
-    <li><strong>Latency p95:</strong> 39 ms</li>
-    <li><strong>Path A hit rate:</strong> ~80% of queries skip the LLM entirely</li>
-    <li><strong>Token cost (Path A):</strong> 0 — template fill is purely retrieval</li>
-    <li><strong>Token cost (Path B):</strong> ~150 — fixed regardless of tool count</li>
-  </ul>
+  <section class="step-section">
+    <h2>Latency &amp; cost</h2>
+    <p>Router-only metrics (does not include LLM call on Path B):</p>
+    <ul>
+      <li><strong>Latency p50:</strong> 36 ms</li>
+      <li><strong>Latency p95:</strong> 39 ms</li>
+      <li><strong>Path A hit rate:</strong> ~80% of queries skip the LLM entirely</li>
+      <li><strong>Token cost (Path A):</strong> 0 — template fill is purely retrieval</li>
+      <li><strong>Token cost (Path B):</strong> ~150 — fixed regardless of tool count</li>
+    </ul>
+  </section>
 
-  <hr>
-
-  <h2>Reproducibility</h2>
-  <p>
-    The router code is on PyPI (<code>pip install clibrary-hub</code>) and GitHub
-    (<a href="https://github.com/clibrary-hub/CLIbrary">clibrary-hub/CLIbrary</a>).
-    Manifests are at <a href="https://github.com/clibrary-hub/manifests">clibrary-hub/manifests</a>.
-    Eval sets are bundled with the router repo under <code>benchmark/eval_sets/</code>.
-  </p>
+  <section class="step-section">
+    <h2>Reproducibility</h2>
+    <p>
+      The router code is on PyPI (<code>pip install clibrary-hub</code>) and GitHub
+      (<a href="https://github.com/clibrary-hub/CLIbrary" style="color:var(--accent);">clibrary-hub/CLIbrary</a>).
+      Manifests are at <a href="https://github.com/clibrary-hub/manifests" style="color:var(--accent);">clibrary-hub/manifests</a>.
+      Eval sets are bundled with the router repo under <code>benchmark/eval_sets/</code>.
+    </p>
+  </section>
 </main>
 
 <footer>
@@ -432,6 +179,16 @@
     MIT License
   </p>
 </footer>
+
+<script>
+  function toggleLang(e) {
+    e.stopPropagation();
+    document.getElementById('lang-switch').classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    document.getElementById('lang-switch').classList.remove('open');
+  });
+</script>
 
 </body>
 </html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLIbrary-Hub — 給 AI Agent 的工具路由系統</title>
+<meta name="description" content="開源的兩階段 CLI router，給 AI agent 用。延遲 ~36ms，僅消耗 ~150 tokens，支援多語言。pip install clibrary-hub。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+<script src="/assets/parallax.js" defer></script>
+</head>
+<body>
+
+<svg class="bg-network" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 1920 1080">
+  <line class="conn"       x1="150"  y1="130" x2="1500" y2="240" />
+  <line class="conn"       x1="270"  y1="520" x2="1690" y2="700" />
+  <line class="conn"       x1="420"  y1="890" x2="1760" y2="380" />
+  <line class="conn"       x1="350"  y1="190" x2="870"  y2="950" />
+  <line class="conn-pulse" x1="150"  y1="130" x2="270"  y2="520" />
+  <line class="conn-pulse" x1="270"  y1="520" x2="420"  y2="890" />
+  <line class="conn-pulse" x1="1500" y1="240" x2="1690" y2="700" />
+  <line class="conn-pulse" x1="1690" y1="700" x2="870"  y2="950" />
+</svg>
+
+<div class="bg-nodes">
+  <span class="node"></span><span class="node"></span><span class="node"></span><span class="node"></span>
+  <span class="node"></span><span class="node"></span><span class="node"></span><span class="node"></span>
+</div>
+
+<nav>
+  <div class="logo"><a href="/zh/">CLIbrary<span>-Hub</span></a></div>
+  <div class="nav-links">
+    <a href="/zh/benchmark.html">效能評測</a>
+    <a href="/zh/create.html">寫一個 Manifest</a>
+    <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
+    <div class="lang-switch" id="lang-switch">
+      <button class="lang-trigger" onclick="toggleLang(event)">中文 <span class="caret">▾</span></button>
+      <div class="lang-menu">
+        <a href="/">English</a>
+        <a href="/zh/" class="current">繁體中文</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">v0.1.3 — 已上 PyPI</div>
+
+  <h1>給 AI agent 的<br><span>工具路由</span>。</h1>
+
+  <p class="hero-sub">
+    兩階段 embedding router，能在數百個 CLI 工具中挑出對的那一個——
+    僅 ~36 ms 延遲、~150 tokens。開源、多語言、不需微調模型。
+  </p>
+
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num">~36ms</span><span class="stat-label">P50 延遲</span></div>
+    <div class="stat"><span class="stat-num">100%</span><span class="stat-label">ADVERSARIAL TOP-3</span></div>
+    <div class="stat"><span class="stat-num">~150</span><span class="stat-label">每次 TOKENS</span></div>
+  </div>
+
+  <div class="install-box">
+    <div class="install-cmd">
+      <span class="prompt">$</span>
+      <span class="cmd" id="install-cmd-text">pip install clibrary-hub</span>
+      <button class="copy-btn" onclick="copyInstall()" id="copy-btn">複製</button>
+    </div>
+    <p class="install-note">
+      原始碼在
+      <a href="https://github.com/clibrary-hub/CLIbrary">GitHub</a>
+      · MIT 授權 · Python 3.10+
+    </p>
+  </div>
+</div>
+
+<div class="terminal-wrap" id="how">
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="terminal-title">clibrary_hub — Python</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="line-comment"># 把 manifests 一次建成 FAISS 索引</span></div>
+      <div><span class="line-prompt">$ </span><span class="line-cmd">clibrary-build-index --manifest-dir ./manifests</span></div>
+      <br>
+      <div><span class="line-comment"># 然後把任何自然語言意圖丟給 router</span></div>
+      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">from clibrary_hub import CLIbrary</span></div>
+      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">router = CLIbrary()</span></div>
+      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">router.route("查上週銷售總額")</span></div>
+      <br>
+      <div><span class="line-out">{</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"action"</span><span class="line-out">: </span><span class="line-val">"route"</span><span class="line-out">,</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"cli"</span><span class="line-out">: </span><span class="line-val">"sql-runner"</span><span class="line-out">,</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"params"</span><span class="line-out">: { </span><span class="line-key">"query"</span><span class="line-out">: </span><span class="line-val">"SELECT SUM(amount) ..."</span><span class="line-out"> },</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"confidence"</span><span class="line-out">: </span><span class="line-val">0.94</span><span class="line-out">,</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"source"</span><span class="line-out">: </span><span class="line-val">"A"</span><span class="line-out">,&nbsp;&nbsp;</span><span class="line-comment"># 模板套用，沒呼叫 LLM</span></div>
+      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"latency_ms"</span><span class="line-out">: </span><span class="line-val">36</span></div>
+      <div><span class="line-out">}</span></div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<section class="block">
+  <p class="section-label">為什麼要用 EMBEDDING ROUTING</p>
+  <h2 class="section-title">把工具全塞進 prompt，<br>規模一大就崩。</h2>
+  <p class="section-sub">當 agent 有 100+ 個工具，LLM 要把每個工具的描述通通讀一遍才能挑——token 成本、延遲、準確度全垮。</p>
+
+  <div class="compare">
+    <div class="compare-card">
+      <h3>把所有工具塞進 PROMPT</h3>
+      <div class="compare-row"><span>每次呼叫 token</span><span class="bad">3,000–50,000</span></div>
+      <div class="compare-row"><span>延遲</span><span class="bad">2–5 秒</span></div>
+      <div class="compare-row"><span>500 工具下準確率</span><span class="bad">~60–70%</span></div>
+      <div class="compare-row"><span>成本隨</span><span class="bad">工具數線性增加</span></div>
+    </div>
+    <div class="compare-card highlight">
+      <h3>CLIBRARY-HUB ROUTING</h3>
+      <div class="compare-row"><span>每次呼叫 token</span><span class="good">~150（固定）</span></div>
+      <div class="compare-row"><span>延遲</span><span class="good">~36 毫秒</span></div>
+      <div class="compare-row"><span>500 工具下準確率</span><span class="good">82–92% top-1</span></div>
+      <div class="compare-row"><span>成本隨</span><span class="good">不增加</span></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="block">
+  <p class="section-label">效能</p>
+  <h2 class="section-title">用實測數字說話。</h2>
+  <p class="section-sub">在 559 個 CLI 工具（CLIbrary + MCP）上跑 2,050 筆 query。數字來自最新 router build（clibrary_top3 策略，multilingual-e5-base）。</p>
+
+  <table>
+    <thead>
+      <tr><th>EVAL SET</th><th>樣本數</th><th class="num">TOP-1</th><th class="num">TOP-3</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>in_domain</td><td class="muted">500</td><td class="num">91%</td><td class="num">95%</td></tr>
+      <tr><td>paraphrase</td><td class="muted">1,500</td><td class="num">81.8%</td><td class="num">83.4%</td></tr>
+      <tr><td>adversarial</td><td class="muted">204</td><td class="num">86.3%</td><td class="num">100%</td></tr>
+    </tbody>
+  </table>
+  <p class="install-note" style="text-align:left; margin-top:1.5rem;">
+    Adversarial set 經過 3 輪 intent-trigger 微調強化，沒有任何模型微調。
+    <a href="/zh/benchmark.html">完整效能評測 →</a>
+  </p>
+</section>
+
+<hr class="divider">
+
+<section class="block">
+  <p class="section-label">原理</p>
+  <h2 class="section-title">兩階段，<br>三個索引。</h2>
+  <p class="section-sub">Stage 1 用 FAISS 召回候選 CLI，Stage 2 比對最相似的範例模板。約 80% 的 query 完全不需呼叫 LLM。</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">STAGE 1 · CLI INDEX</div>
+      <h3>平均池化候選召回</h3>
+      <p>每個 CLI 的 intent_triggers 都被 embed 並做平均池化，FAISS 找出 top-3 候選。再用 trigger_index 做 MaxSim 重排。</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">STAGE 2 · EXAMPLE INDEX</div>
+      <h3>模板比對 + A/B 分流</h3>
+      <p>在勝出的 CLI 內找最相似的 example.query。相似度 ≥ 0.85 直接套模板（A 路，免 LLM），否則交給小模型抽參數（B 路）。</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">CLARIFY GATE</div>
+      <h3>不確定就問，不亂猜</h3>
+      <p>當 top-1 信心不夠且跟 top-2 差距太小時，回傳三個候選讓 agent 詢問使用者。把「沉默誤導」降到趨近於零。</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="block">
+  <p class="section-label">MANIFESTS</p>
+  <h2 class="section-title">每個 CLI<br>就是一個 JSON 檔。</h2>
+  <p class="section-sub">Manifest 描述一個工具：做什麼、何時用、需要什麼、回傳什麼。Manifests 放在獨立的 MIT 授權註冊表。</p>
+
+  <div class="categories">
+    <div class="cat">ai-ml</div>
+    <div class="cat">devops</div>
+    <div class="cat">data</div>
+    <div class="cat">web</div>
+    <div class="cat">security</div>
+    <div class="cat">media</div>
+    <div class="cat">productivity</div>
+    <div class="cat">finance</div>
+    <div class="cat">science</div>
+    <div class="cat">networking</div>
+  </div>
+
+  <p class="install-note" style="text-align:left; margin-top:2rem;">
+    上 <a href="https://github.com/clibrary-hub/manifests">GitHub</a> 瀏覽註冊表，
+    或 <a href="/zh/create.html">寫一個自己的 manifest →</a>
+  </p>
+</section>
+
+<footer>
+  <p>
+    <a href="https://pypi.org/project/clibrary-hub/">PyPI</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/CLIbrary">Router</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/clibrary-hub/manifests">Manifests</a>
+    &nbsp;·&nbsp;
+    MIT 授權
+  </p>
+</footer>
+
+<script>
+  function copyInstall() {
+    const text = document.getElementById('install-cmd-text').textContent;
+    const btn = document.getElementById('copy-btn');
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '已複製';
+      btn.style.color = '#00e5a0';
+      btn.style.borderColor = '#00e5a0';
+      setTimeout(() => {
+        btn.textContent = '複製';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 1500);
+    });
+  }
+  function toggleLang(e) {
+    e.stopPropagation();
+    document.getElementById('lang-switch').classList.toggle('open');
+  }
+  document.addEventListener('click', () => {
+    document.getElementById('lang-switch').classList.remove('open');
+  });
+</script>
+
+</body>
+</html>
