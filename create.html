@@ -186,16 +186,26 @@
   <section class="step-section">
     <h2><span class="num">06</span>Validate locally</h2>
 
-<pre><code><span class="c"># Install the router (also gives you the build CLI)</span>
+    <p>Two-step check: <strong>schema first</strong>, <strong>routing second</strong>.</p>
+
+<pre><code><span class="c"># Install</span>
 pip install clibrary-hub
 
-<span class="c"># Build FAISS indices including your new manifest</span>
+<span class="c"># 1. Schema check — does your manifest meet the format rules?</span>
+python -c "from clibrary_hub import validator; r = validator.validate_file('manifests/media/your-tool.json'); print(r); [print('  ERROR:', e) for e in r.errors]; [print('  WARN: ', w) for w in r.warnings]"
+
+<span class="c"># 2. Build FAISS indices including your new manifest</span>
 clibrary-build-index --manifest-dir ./manifests
 
-<span class="c"># Try routing some intents</span>
+<span class="c"># 3. Routing check — does the router actually pick your tool?</span>
 python -c "from clibrary_hub import router; print(router.route('make a gif from demo.mp4'))"</code></pre>
 
-    <p>If the router doesn't pick your tool for an obvious intent, your <code>intent_triggers</code> probably need more variety or stronger keyword anchors.</p>
+    <div class="callout">
+      <strong>What the validator checks.</strong>
+      <p style="margin-top:0.6rem;">Required fields, <code>name</code> kebab-case, semver <code>version</code>, allowed <code>category</code>, <code>description</code> length 10–200, ≥ 5 <code>intent_triggers</code> (warns if single-language), <code>input_schema</code> types, <code>output_schema.format</code>, <code>examples</code> structure, and <code>error_codes</code>. Runs entirely offline.</p>
+    </div>
+
+    <p>If the router doesn't pick your tool for an obvious intent (after schema passes), your <code>intent_triggers</code> probably need more variety or stronger keyword anchors.</p>
   </section>
 
   <section class="step-section">

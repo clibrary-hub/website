@@ -185,16 +185,26 @@
   <section class="step-section">
     <h2><span class="num">06</span>本地驗證</h2>
 
-<pre><code><span class="c"># 安裝 router（會一併拿到 build CLI 工具）</span>
+    <p>兩步驟檢查：<strong>先驗 schema</strong>、<strong>再驗 routing</strong></p>
+
+<pre><code><span class="c"># 安裝</span>
 pip install clibrary-hub
 
-<span class="c"># 把你新加的 manifest 一起 build 進 FAISS index</span>
+<span class="c"># 1. Schema 檢查 — manifest 的格式對不對？</span>
+python -c "from clibrary_hub import validator; r = validator.validate_file('manifests/media/your-tool.json'); print(r); [print('  ERROR:', e) for e in r.errors]; [print('  WARN: ', w) for w in r.warnings]"
+
+<span class="c"># 2. 建 FAISS index（含新加的 manifest）</span>
 clibrary-build-index --manifest-dir ./manifests
 
-<span class="c"># 試幾個自然語言意圖看看 router 選不選得到</span>
+<span class="c"># 3. Routing 檢查 — router 實際上會選到你的工具嗎？</span>
 python -c "from clibrary_hub import router; print(router.route('幫我把 demo.mp4 做成 gif'))"</code></pre>
 
-    <p>如果一個明顯的意圖 router 沒選到你的工具，多半是 <code>intent_triggers</code> 多樣性不夠，或關鍵詞錨點太弱</p>
+    <div class="callout">
+      <strong>Validator 會檢查什麼</strong>
+      <p style="margin-top:0.6rem;">必填欄位、<code>name</code> kebab-case、semver 版號、合法 <code>category</code>、<code>description</code> 長度 10–200、≥ 5 條 <code>intent_triggers</code>（單一語言會給 warning）、<code>input_schema</code> 型別、<code>output_schema.format</code>、<code>examples</code> 結構、<code>error_codes</code>完全離線執行</p>
+    </div>
+
+    <p>如果 schema 過了但 router 沒選到你的工具，多半是 <code>intent_triggers</code> 多樣性不夠或關鍵詞錨點太弱</p>
   </section>
 
   <section class="step-section">
