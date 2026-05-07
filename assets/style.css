@@ -211,11 +211,14 @@ nav {
 
 .logo {
   font-family: var(--mono);
-  font-size: 1.9rem;
+  font-size: 3.6rem;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.02em;
   line-height: 1;
+}
+@media (max-width: 720px) {
+  .logo { font-size: 1.5rem; }
 }
 .logo a {
   color: inherit;
