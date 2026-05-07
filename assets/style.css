@@ -267,10 +267,17 @@ nav a:hover { color: var(--accent); }
 .lang-active { color: var(--accent) !important; }
 
 @media (max-width: 720px) {
-  nav { padding: 0.55rem 1rem; }
+  nav {
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;     /* let nav-links wrap below logo if needed */
+  }
   .logo { font-size: 1.6rem; }
-  .nav-links { gap: 0.9rem; }
+  .nav-links { gap: 0.7rem; flex-wrap: wrap; }
   .nav-divider { display: none; }
+  nav a { font-size: 0.78rem; }
+}
+@media (max-width: 460px) {
+  /* Very small screens: hide secondary page links to keep nav usable */
   nav a:not(.nav-cta):not(.lang-trigger) { display: none; }
 }
 
