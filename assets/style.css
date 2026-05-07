@@ -34,11 +34,17 @@ body {
    Agent-routing background — high-contrast tech feel
    ============================================================ */
 
+/* Parallax tracking — JS updates these CSS vars on mousemove */
+:root {
+  --mx: 0px;     /* mouse offset from center, X */
+  --my: 0px;     /* mouse offset from center, Y */
+}
+
 /* Layer 1: visible grid + bright dots at intersections */
 body::before {
   content: '';
   position: fixed;
-  inset: 0;
+  inset: -40px;  /* extra room for parallax movement */
   background:
     /* dots at every intersection — visible, slight glow */
     radial-gradient(circle at 0 0,
@@ -57,13 +63,16 @@ body::before {
   z-index: 0;
   mask-image: radial-gradient(ellipse 120% 100% at 50% 30%, black 30%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.4) 100%);
   -webkit-mask-image: radial-gradient(ellipse 120% 100% at 50% 30%, black 30%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.4) 100%);
+  transform: translate3d(calc(var(--mx) * 0.5), calc(var(--my) * 0.5), 0);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
 }
 
-/* Layer 2: dramatic accent glows */
+/* Layer 2: dramatic accent glows — moves opposite for depth */
 body::after {
   content: '';
   position: fixed;
-  inset: 0;
+  inset: -80px;
   background:
     /* huge top center green glow */
     radial-gradient(ellipse 1400px 700px at 50% -10%,
@@ -76,24 +85,35 @@ body::after {
       rgba(125, 211, 252, 0.08), transparent 60%);
   pointer-events: none;
   z-index: 0;
+  transform: translate3d(calc(var(--mx) * -0.25), calc(var(--my) * -0.25), 0);
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
 }
 
 /* SVG network overlay — animated routing lines + active nodes */
 .bg-network {
   position: fixed;
-  inset: 0;
+  inset: -60px;
   pointer-events: none;
   z-index: 0;
-  width: 100%;
-  height: 100%;
+  width: calc(100% + 120px);
+  height: calc(100% + 120px);
+  transform: translate3d(calc(var(--mx) * 0.8), calc(var(--my) * 0.8), 0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
 }
 
-/* Active "routing" nodes — bigger, brighter */
+/* Active "routing" nodes — bigger, brighter, parallax */
 .bg-nodes {
   position: fixed;
-  inset: 0;
+  inset: -50px;
   pointer-events: none;
   z-index: 0;
+  width: calc(100% + 100px);
+  height: calc(100% + 100px);
+  transform: translate3d(calc(var(--mx) * 1.2), calc(var(--my) * 1.2), 0);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
 }
 .bg-nodes .node {
   position: absolute;
@@ -191,15 +211,29 @@ nav {
 
 .logo {
   font-family: var(--mono);
-  font-size: 1.35rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.02em;
+  line-height: 1;
 }
-.logo a { color: inherit; text-decoration: none; }
+.logo a {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.logo a:hover {
+  border-color: var(--border);
+  background: rgba(0, 229, 160, 0.04);
+}
 .logo span {
   color: var(--accent);
-  text-shadow: 0 0 16px rgba(0, 229, 160, 0.5);
+  text-shadow: 0 0 18px rgba(0, 229, 160, 0.6);
 }
 
 nav a {
