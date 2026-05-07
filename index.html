@@ -84,36 +84,48 @@
 
 <section class="flow-wrap" id="flow">
   <p class="section-label">LIVE DEMO</p>
-  <h2>What you type. <span>What comes back.</span></h2>
-  <p class="section-sub">Two real Python sessions, looped on this page. Same library, two ways to drive it.</p>
+  <h2>The same call, <span>two views</span>.</h2>
+  <p class="section-sub">Left: what a developer sees — typed code in, JSON out. Right: what an LLM agent's user sees — natural language, options, progress. The library underneath is the exact same.</p>
 
   <div class="flow-dual">
 
-    <div class="flow-col">
-      <div class="flow-col-label">HUMAN · ONE-SHOT</div>
-      <p class="flow-col-tagline">You ask, the router answers, you run the command. Done.</p>
+    <div class="flow-col human" data-lang="en">
+      <div class="flow-col-label">HUMAN · PROCESS</div>
+      <p class="flow-col-tagline">You type. The terminal returns JSON. The router stays out of your way.</p>
+
       <div class="term-window">
         <div class="term-bar">
           <div class="dot dot-r"></div>
           <div class="dot dot-y"></div>
           <div class="dot dot-g"></div>
-          <span class="term-title">user@laptop · python</span>
+          <span class="term-title">input · what you type</span>
         </div>
-        <div class="term-screen" data-seq="human" data-lang="en"></div>
+        <div class="term-pane h-input" data-pane="input"></div>
+      </div>
+
+      <div class="term-window">
+        <div class="term-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="term-title">terminal · what comes back</span>
+        </div>
+        <div class="term-pane h-output" data-pane="output"></div>
       </div>
     </div>
 
-    <div class="flow-col agent">
-      <div class="flow-col-label">LLM AGENT · WITH CLARIFY</div>
-      <p class="flow-col-tagline">When the intent is vague the router returns top-3 candidates. The LLM picks one and the agent runs it.</p>
+    <div class="flow-col agent" data-lang="en">
+      <div class="flow-col-label">LLM AGENT · USER VIEW</div>
+      <p class="flow-col-tagline">No JSON. The agent translates everything into a natural reply: status, choices, progress, done.</p>
+
       <div class="term-window">
         <div class="term-bar">
           <div class="dot dot-r"></div>
           <div class="dot dot-y"></div>
           <div class="dot dot-g"></div>
-          <span class="term-title">agent-runtime · python</span>
+          <span class="term-title">agent</span>
         </div>
-        <div class="term-screen" data-seq="agent" data-lang="en"></div>
+        <div class="term-pane agent"></div>
       </div>
     </div>
 

@@ -728,9 +728,8 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
   letter-spacing: 0.05em;
 }
 
-.term-screen {
-  padding: 1.3rem 1.4rem;
-  height: 520px;
+.term-pane {
+  padding: 1.2rem 1.3rem;
   overflow-y: auto;
   line-height: 1.65;
   color: var(--text);
@@ -738,8 +737,88 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
-.term-screen::-webkit-scrollbar { width: 6px; }
-.term-screen::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.term-pane::-webkit-scrollbar { width: 6px; }
+.term-pane::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.term-pane.h-input  { height: 200px; }
+.term-pane.h-output { height: 280px; }
+.term-pane.agent    { height: 500px; }
+
+.term-window + .term-window { margin-top: 0.85rem; }
+
+/* ── Chat-style lines (agent column) ─────────────────────────── */
+.t-chat-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  margin-right: 0.6rem;
+  font-weight: 700;
+  vertical-align: 1px;
+  text-transform: uppercase;
+}
+.t-chat-label.t-chat-user {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+}
+.t-chat-label.t-chat-agent {
+  color: #7dd3fc;
+  background: rgba(125, 211, 252, 0.08);
+  border: 1px solid #7dd3fc;
+}
+.t-chat-text { color: var(--text); }
+
+/* ── Status / spinner / progress ─────────────────────────────── */
+.t-status      { color: #7dd3fc; }
+.t-status-dim  { color: var(--muted); font-style: italic; }
+.t-spinner     { color: var(--accent); display: inline-block; width: 1ch; }
+
+.t-progress {
+  display: inline-block;
+  width: 240px;
+  height: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  vertical-align: middle;
+  margin-right: 0.6rem;
+}
+.t-progress-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #4dffc8);
+  transition: width 0.08s linear;
+  box-shadow: 0 0 12px rgba(0, 229, 160, 0.5);
+}
+.t-progress-pct { color: var(--accent); font-size: 0.78rem; }
+
+/* ── Tool option list ────────────────────────────────────────── */
+.t-tool {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0.8rem;
+  margin: 0.25rem 0 0.25rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-2);
+  transition: all 0.3s;
+  font-size: 0.83rem;
+}
+.t-tool.picked {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 18px rgba(0, 229, 160, 0.2);
+}
+.t-tool-num {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1rem;
+}
+.t-tool-name { color: var(--text); font-weight: 700; }
+.t-tool-desc { color: var(--muted); }
 
 /* Dual-pane terminal layout */
 .flow-dual {
