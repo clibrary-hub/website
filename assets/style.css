@@ -675,12 +675,12 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
 }
 
 /* ============================================================
-   Animated flow diagram (homepage)
+   Animated terminal session (homepage)
    ============================================================ */
 .flow-wrap {
   position: relative;
   z-index: 1;
-  max-width: 920px;
+  max-width: 880px;
   margin: 0 auto 6rem;
   padding: 4rem 2rem 2rem;
 }
@@ -691,169 +691,89 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
   text-align: center;
   margin-bottom: 0.6rem;
   letter-spacing: -0.01em;
-  display: block;
 }
+.flow-wrap h2 span { color: var(--accent); }
 .flow-wrap .section-sub {
   text-align: center;
-  margin: 0 auto 3rem;
+  margin: 0 auto 2.5rem;
   color: var(--muted);
   max-width: 560px;
   font-size: 0.95rem;
 }
 
-.flow-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-.flow-stage {
-  width: 100%;
-  max-width: 720px;
+.term-window {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.5rem 1.75rem;
-  position: relative;
-  transition: border-color 0.4s, box-shadow 0.4s, transform 0.4s, background 0.4s;
-  opacity: 0.55;
-}
-.flow-stage.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent), 0 0 36px rgba(0, 229, 160, 0.22);
-  background: linear-gradient(180deg, rgba(0, 229, 160, 0.05), var(--surface));
-  opacity: 1;
-  transform: translateY(-2px);
-}
-
-.flow-step {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 0.85rem;
-}
-.flow-step-num {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  padding: 0.2rem 0.55rem;
-  border-radius: 3px;
-  transition: all 0.4s;
-}
-.flow-stage.active .flow-step-num {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: var(--accent-dim);
-}
-.flow-step-title {
+  border-radius: 10px;
+  overflow: hidden;
   font-family: var(--mono);
   font-size: 0.92rem;
-  color: var(--text);
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(0, 229, 160, 0.06);
 }
-
-.flow-body {
-  font-family: var(--mono);
-  font-size: 0.83rem;
-  line-height: 1.85;
-  color: var(--muted);
-}
-.flow-body .pair {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 0.75rem;
-  align-items: baseline;
-  padding: 0.35rem 0;
-  border-bottom: 1px dashed var(--border);
-}
-.flow-body .pair:last-child { border-bottom: none; }
-.flow-body .pair-tag {
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  background: var(--accent-dim);
-  padding: 0.2rem 0.5rem;
-  border-radius: 3px;
-  border: 1px solid var(--accent);
-  text-align: center;
-  font-weight: 700;
-}
-.flow-body .pair-tag.llm { color: #7dd3fc; border-color: #7dd3fc; background: rgba(125, 211, 252, 0.08); }
-.flow-body .pair-text { color: var(--text); }
-.flow-body code {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--text);
-  font-size: 0.85rem;
-}
-.flow-body .json-key { color: #7dd3fc; }
-.flow-body .json-val { color: #86efac; }
-.flow-body .json-num { color: #fbbf24; }
-.flow-body .comment { color: #4b5563; }
-.flow-body .check { color: var(--accent); font-weight: bold; }
-
-.flow-meta {
+.term-bar {
+  background: #141c24;
+  padding: 0.7rem 1rem;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
-  margin-top: 1rem;
+  border-bottom: 1px solid var(--border);
 }
-.flow-chip {
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  padding: 0.25rem 0.6rem;
-  border: 1px solid var(--border);
-  border-radius: 3px;
+.term-title {
+  font-size: 0.72rem;
   color: var(--muted);
+  margin-left: auto;
+  margin-right: auto;
   letter-spacing: 0.05em;
 }
-.flow-chip.green { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
 
-.flow-arrow {
-  width: 2px;
-  height: 32px;
-  background: var(--border);
-  position: relative;
-  overflow: hidden;
+#term-screen {
+  padding: 1.4rem 1.5rem;
+  height: 480px;
+  overflow-y: auto;
+  line-height: 1.65;
+  color: var(--text);
+  font-size: 0.88rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
-.flow-arrow::before {
+#term-screen::-webkit-scrollbar { width: 6px; }
+#term-screen::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.t-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.t-line.t-res { padding-left: 0; }
+
+.t-prompt { color: var(--accent); user-select: none; }
+.t-key    { color: #7dd3fc; }
+.t-val    { color: #86efac; }
+.t-num    { color: #fbbf24; }
+.t-good   { color: var(--accent); font-weight: bold; }
+.t-muted  { color: var(--muted); }
+.t-note   { color: #6b7280; font-style: italic; }
+
+/* Blinking cursor at the very end of the screen */
+#term-screen::after {
   content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, var(--accent), transparent);
-  transform: translateY(-100%);
-  transition: transform 0.5s ease-in;
-}
-.flow-arrow.active::before {
-  transform: translateY(0);
-}
-.flow-arrow::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 50%;
+  display: inline-block;
   width: 8px;
-  height: 8px;
-  border-right: 2px solid var(--border);
-  border-bottom: 2px solid var(--border);
-  transform: translateX(-50%) rotate(45deg);
-  transition: border-color 0.4s;
+  height: 1em;
+  background: var(--accent);
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  animation: termBlink 1s steps(1, end) infinite;
 }
-.flow-arrow.active::after {
-  border-right-color: var(--accent);
-  border-bottom-color: var(--accent);
+@keyframes termBlink {
+  0%, 50%   { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 @media (max-width: 600px) {
-  .flow-stage { padding: 1.2rem 1.2rem; }
-  .flow-body { font-size: 0.78rem; }
-  .flow-body .pair { grid-template-columns: 70px 1fr; gap: 0.5rem; }
+  #term-screen { font-size: 0.78rem; height: 420px; padding: 1.1rem 1rem; }
+  .flow-wrap { padding: 2.5rem 1rem 1rem; }
 }
 
 /* ============================================================

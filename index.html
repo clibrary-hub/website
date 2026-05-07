@@ -83,137 +83,20 @@
 </div>
 
 <section class="flow-wrap" id="flow">
-  <p class="section-label">END-TO-END FLOW</p>
-  <h2>One intent. Five stages. <span style="color:var(--accent);">Same shape</span> for humans and agents.</h2>
-  <p class="section-sub">Whoever sends the intent, the path through the router is identical. Watch what each side sees at every step.</p>
+  <p class="section-label">LIVE DEMO</p>
+  <h2>What you type. <span>What comes back.</span></h2>
+  <p class="section-sub">A real Python session — typed in front of you, looped on this page. The same flow a human or an agent goes through.</p>
 
-  <div class="flow-grid">
-
-    <div class="flow-stage" data-stage="1">
-      <div class="flow-step">
-        <span class="flow-step-num">01</span>
-        <span class="flow-step-title">Intent enters</span>
-      </div>
-      <div class="flow-body">
-        <div class="pair">
-          <span class="pair-tag">HUMAN</span>
-          <span class="pair-text">$ python -c "from clibrary_hub import router; router.route('make a gif from demo.mp4')"</span>
-        </div>
-        <div class="pair">
-          <span class="pair-tag llm">LLM AGENT</span>
-          <span class="pair-text">user → "把 demo.mp4 做成 gif" → agent calls <code>router.route(...)</code></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="flow-arrow"></div>
-
-    <div class="flow-stage" data-stage="2">
-      <div class="flow-step">
-        <span class="flow-step-num">02</span>
-        <span class="flow-step-title">router.route() — embed + retrieve</span>
-      </div>
-      <div class="flow-body">
-        <div><span class="comment"># multilingual-e5-base encodes the intent</span></div>
-        <div>q_vec = model.encode("query: " + intent)</div>
-        <div><span class="comment"># Stage 1: FAISS top-3 over 559 CLI vectors</span></div>
-        <div>top3 = cli_index.search(q_vec, k=3)</div>
-        <div><span class="comment"># Stage 2: closest example template</span></div>
-        <div>ex = example_index.search(q_vec, k=1)</div>
-      </div>
-      <div class="flow-meta">
-        <span class="flow-chip green">~36 ms</span>
-        <span class="flow-chip">Path A · template fill, no LLM</span>
-      </div>
-    </div>
-
-    <div class="flow-arrow"></div>
-
-    <div class="flow-stage" data-stage="3">
-      <div class="flow-step">
-        <span class="flow-step-num">03</span>
-        <span class="flow-step-title">Tool call returned</span>
-      </div>
-      <div class="flow-body">
-<pre style="background:transparent;border:none;padding:0;margin:0;font-size:0.83rem;line-height:1.7;"><code>{
-  <span class="json-key">"action"</span>: <span class="json-val">"route"</span>,
-  <span class="json-key">"cli"</span>: <span class="json-val">"video-to-gif"</span>,
-  <span class="json-key">"params"</span>: {
-    <span class="json-key">"input"</span>:  <span class="json-val">"demo.mp4"</span>,
-    <span class="json-key">"output"</span>: <span class="json-val">"demo.gif"</span>,
-    <span class="json-key">"fps"</span>:    <span class="json-num">15</span>
-  },
-  <span class="json-key">"confidence"</span>: <span class="json-num">0.94</span>,
-  <span class="json-key">"source"</span>:     <span class="json-val">"A"</span>,
-  <span class="json-key">"latency_ms"</span>: <span class="json-num">36</span>
-}</code></pre>
-      </div>
-    </div>
-
-    <div class="flow-arrow"></div>
-
-    <div class="flow-stage" data-stage="4">
-      <div class="flow-step">
-        <span class="flow-step-num">04</span>
-        <span class="flow-step-title">Caller executes the CLI</span>
-      </div>
-      <div class="flow-body">
-        <div class="pair">
-          <span class="pair-tag">HUMAN</span>
-          <span class="pair-text">$ video-to-gif --input demo.mp4 --output demo.gif --fps 15</span>
-        </div>
-        <div class="pair">
-          <span class="pair-tag llm">LLM AGENT</span>
-          <span class="pair-text">subprocess.run([cli, ...params], check=True)  &nbsp;<span class="comment"># same command</span></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="flow-arrow"></div>
-
-    <div class="flow-stage" data-stage="5">
-      <div class="flow-step">
-        <span class="flow-step-num">05</span>
-        <span class="flow-step-title">Success signal</span>
-      </div>
-      <div class="flow-body">
-        <div><span class="check">✓</span> <code>exit 0</code> — <span class="comment">tool ran cleanly</span></div>
-        <div><span class="check">✓</span> <code>demo.gif</code> written, 1.2 MB, 75 frames</div>
-        <div><span class="check">✓</span> stdout JSON parsed: <code><span class="json-key">"output_path"</span>: <span class="json-val">"demo.gif"</span></code></div>
-        <div style="margin-top: 0.6rem;"><span class="comment"># LLM agent reads exit code + stdout fields → reports back to user</span></div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<div class="terminal-wrap" id="how">
-  <div class="terminal">
-    <div class="terminal-bar">
+  <div class="term-window">
+    <div class="term-bar">
       <div class="dot dot-r"></div>
       <div class="dot dot-y"></div>
       <div class="dot dot-g"></div>
-      <span class="terminal-title">clibrary_hub — Python</span>
+      <span class="term-title">user@laptop ~ · python</span>
     </div>
-    <div class="terminal-body">
-      <div><span class="line-comment"># Build the FAISS indices once from your manifests</span></div>
-      <div><span class="line-prompt">$ </span><span class="line-cmd">clibrary-build-index --manifest-dir ./manifests</span></div>
-      <br>
-      <div><span class="line-comment"># Then route any natural-language intent</span></div>
-      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">from clibrary_hub import router</span></div>
-      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">router.route("查上週銷售總額")</span></div>
-      <br>
-      <div><span class="line-out">{</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"action"</span><span class="line-out">: </span><span class="line-val">"route"</span><span class="line-out">,</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"cli"</span><span class="line-out">: </span><span class="line-val">"sql-runner"</span><span class="line-out">,</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"params"</span><span class="line-out">: { </span><span class="line-key">"query"</span><span class="line-out">: </span><span class="line-val">"SELECT SUM(amount) ..."</span><span class="line-out"> },</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"confidence"</span><span class="line-out">: </span><span class="line-val">0.94</span><span class="line-out">,</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"source"</span><span class="line-out">: </span><span class="line-val">"A"</span><span class="line-out">,&nbsp;&nbsp;</span><span class="line-comment"># template fill, no LLM</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"latency_ms"</span><span class="line-out">: </span><span class="line-val">36</span></div>
-      <div><span class="line-out">}</span></div>
-    </div>
+    <div id="term-screen"></div>
   </div>
-</div>
+</section>
 
 <hr class="divider">
 
