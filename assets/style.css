@@ -675,6 +675,188 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
 }
 
 /* ============================================================
+   Animated flow diagram (homepage)
+   ============================================================ */
+.flow-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 920px;
+  margin: 0 auto 6rem;
+  padding: 4rem 2rem 2rem;
+}
+.flow-wrap .section-label { text-align: center; }
+.flow-wrap h2 {
+  font-family: var(--mono);
+  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+  text-align: center;
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.01em;
+  display: block;
+}
+.flow-wrap .section-sub {
+  text-align: center;
+  margin: 0 auto 3rem;
+  color: var(--muted);
+  max-width: 560px;
+  font-size: 0.95rem;
+}
+
+.flow-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.flow-stage {
+  width: 100%;
+  max-width: 720px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem 1.75rem;
+  position: relative;
+  transition: border-color 0.4s, box-shadow 0.4s, transform 0.4s, background 0.4s;
+  opacity: 0.55;
+}
+.flow-stage.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 36px rgba(0, 229, 160, 0.22);
+  background: linear-gradient(180deg, rgba(0, 229, 160, 0.05), var(--surface));
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.85rem;
+}
+.flow-step-num {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.55rem;
+  border-radius: 3px;
+  transition: all 0.4s;
+}
+.flow-stage.active .flow-step-num {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.flow-step-title {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.flow-body {
+  font-family: var(--mono);
+  font-size: 0.83rem;
+  line-height: 1.85;
+  color: var(--muted);
+}
+.flow-body .pair {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+.flow-body .pair:last-child { border-bottom: none; }
+.flow-body .pair-tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--accent);
+  text-align: center;
+  font-weight: 700;
+}
+.flow-body .pair-tag.llm { color: #7dd3fc; border-color: #7dd3fc; background: rgba(125, 211, 252, 0.08); }
+.flow-body .pair-text { color: var(--text); }
+.flow-body code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+.flow-body .json-key { color: #7dd3fc; }
+.flow-body .json-val { color: #86efac; }
+.flow-body .json-num { color: #fbbf24; }
+.flow-body .comment { color: #4b5563; }
+.flow-body .check { color: var(--accent); font-weight: bold; }
+
+.flow-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.flow-chip {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+.flow-chip.green { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+.flow-arrow {
+  width: 2px;
+  height: 32px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.flow-arrow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--accent), transparent);
+  transform: translateY(-100%);
+  transition: transform 0.5s ease-in;
+}
+.flow-arrow.active::before {
+  transform: translateY(0);
+}
+.flow-arrow::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  transform: translateX(-50%) rotate(45deg);
+  transition: border-color 0.4s;
+}
+.flow-arrow.active::after {
+  border-right-color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 600px) {
+  .flow-stage { padding: 1.2rem 1.2rem; }
+  .flow-body { font-size: 0.78rem; }
+  .flow-body .pair { grid-template-columns: 70px 1fr; gap: 0.5rem; }
+}
+
+/* ============================================================
    Terminal
    ============================================================ */
 .terminal-wrap {
