@@ -101,13 +101,27 @@
       <strong>意涵</strong>
       <p style="margin-top:0.6rem;">當 router 扛起檢索責任，把 LLM 從 3B 換到 14B（4.7 倍參數）幾乎沒帶來任何額外準確率在大模型上花的算力是浪費——把資源放在更好的 <code>intent_triggers</code> 上面</p>
     </div>
+
+    <p>更極端的版本：在 in_domain 評測上，約 98% 的 query 走 A 路（直接套模板，完全不呼叫 LLM）：</p>
+
+    <table>
+      <thead>
+        <tr><th>模型</th><th>評測</th><th>樣本</th><th class="num">CLI 準確</th><th class="num">Top-3</th><th class="num">A 路命中</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>qwen2.5:3b</td><td>in_domain</td><td class="muted">500</td><td class="num">86.80%</td><td class="num">88.00%</td><td class="num">98.64%</td></tr>
+        <tr><td>qwen2.5:14b</td><td>in_domain</td><td class="muted">500</td><td class="num">86.80%</td><td class="num">88.00%</td><td class="num">98.64%</td></tr>
+        <tr><td class="muted-l">Δ (3b − 14b)</td><td colspan="2"></td><td class="muted">±0</td><td class="muted">±0</td><td class="muted">±0</td></tr>
+      </tbody>
+    </table>
+    <p class="install-note" style="text-align:left;margin-top:1rem;">兩個模型的所有指標<em>連小數點後 4 位都一樣</em>——當 98.6% 的 query 完全跳過 LLM，模型大小就邏輯上不可能造成差別</p>
   </section>
 
   <section class="step-section">
     <h2>Adversarial 評測集</h2>
     <p>
       Adversarial 評測共 204 筆，每個 intent 都被刻意設計來誤導 router：
-      表面詞彙指向工具 A，但語意核心是工具 B（intent confusion、false friends、ambiguous scope、negation traps）
+      表面詞彙指向工具 A，但語意核心是工具 B（intent confusion、false friends、ambiguous scope、negation traps）下面數字皆使用 <code>clibrary_top3</code> 策略
     </p>
 
     <table>
@@ -122,9 +136,21 @@
       </tbody>
     </table>
 
+    <p>套用 R3 後 FAISS 索引、兩個模型對照：</p>
+
+    <table>
+      <thead>
+        <tr><th>模型</th><th>樣本</th><th class="num">CLI 準確</th><th class="num">Top-3</th><th class="num">Pick</th><th class="num">參數</th><th class="num">E2E</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>qwen2.5:3b</td><td class="muted">204</td><td class="num">84.31%</td><td class="num">100%</td><td class="num">84.31%</td><td class="num">86.27%</td><td class="num">77.94%</td></tr>
+        <tr><td>qwen2.5:14b</td><td class="muted">204</td><td class="num">86.27%</td><td class="num">100%</td><td class="num">86.27%</td><td class="num">87.75%</td><td class="num">79.90%</td></tr>
+      </tbody>
+    </table>
+
     <div class="callout">
       <strong>三輪 trigger 修補把 adversarial 變成 100% 召回問題</strong>
-      <p style="margin-top:0.6rem;">沒做任何模型微調CLI 準確 86.3% 跟 Top-3 100% 之間剩下的 13.7pp，是 LLM 從 top-3 選錯的部分，不是檢索問題</p>
+      <p style="margin-top:0.6rem;">Top-3 = 100% 表示正確工具一定在前三名；CLI 準確 84–86% 之間的差距，是 LLM 從這 3 個裡挑錯的部分大模型在這裡略有幫助（+1.96 pp）——這是整份報告中唯一能看到模型大小確實有影響的場景</p>
     </div>
   </section>
 
@@ -132,13 +158,13 @@
     <h2>其他評測集（qwen2.5:3b）</h2>
     <table>
       <thead>
-        <tr><th>評測</th><th>樣本</th><th class="num">CLI 準確</th><th class="num">Top-3</th><th class="num">E2E</th></tr>
+        <tr><th>評測</th><th>策略</th><th>樣本</th><th class="num">CLI 準確</th><th class="num">Top-3</th><th class="num">E2E</th></tr>
       </thead>
       <tbody>
-        <tr><td>in_domain</td><td class="muted">500</td><td class="num">~91%</td><td class="num">~95%</td><td class="num">—</td></tr>
-        <tr><td>paraphrase</td><td class="muted">1,500</td><td class="num">81.80%</td><td class="num">83.40%</td><td class="num">61.27%</td></tr>
-        <tr><td>cross_domain</td><td class="muted">328</td><td class="num">68.9%</td><td class="num">—</td><td class="num">67.7%</td></tr>
-        <tr><td>adversarial（R3 後）</td><td class="muted">204</td><td class="num">86.3%</td><td class="num">100%</td><td class="num">79.9%</td></tr>
+        <tr><td>in_domain</td><td>clibrary</td><td class="muted">500</td><td class="num">86.80%</td><td class="num">88.00%</td><td class="num">65.20%</td></tr>
+        <tr><td>paraphrase</td><td>clibrary</td><td class="muted">1,500</td><td class="num">81.80%</td><td class="num">83.40%</td><td class="num">61.27%</td></tr>
+        <tr><td>cross_domain</td><td>clibrary</td><td class="muted">328</td><td class="num">68.90%</td><td class="num">—</td><td class="num">67.70%</td></tr>
+        <tr><td>adversarial（R3 後）</td><td>clibrary_top3</td><td class="muted">204</td><td class="num">84.31%</td><td class="num">100%</td><td class="num">77.94%</td></tr>
       </tbody>
     </table>
   </section>

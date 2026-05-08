@@ -101,6 +101,20 @@
       <strong>Implication.</strong>
       <p style="margin-top:0.6rem;">When the router does the heavy lifting, scaling the LLM from 3B to 14B (4.7×) gives essentially zero additional accuracy. Compute spent on a bigger model is wasted — spend it on better <code>intent_triggers</code> instead.</p>
     </div>
+
+    <p>An even stronger version of the same finding shows up on the in_domain set, where ~98% of queries hit Path A (template fill, no LLM at all):</p>
+
+    <table>
+      <thead>
+        <tr><th>Model</th><th>Eval</th><th>N</th><th class="num">CLI Acc</th><th class="num">Top-3</th><th class="num">A-path hit</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>qwen2.5:3b</td><td>in_domain</td><td class="muted">500</td><td class="num">86.80%</td><td class="num">88.00%</td><td class="num">98.64%</td></tr>
+        <tr><td>qwen2.5:14b</td><td>in_domain</td><td class="muted">500</td><td class="num">86.80%</td><td class="num">88.00%</td><td class="num">98.64%</td></tr>
+        <tr><td class="muted-l">Δ (3b − 14b)</td><td colspan="2"></td><td class="muted">±0</td><td class="muted">±0</td><td class="muted">±0</td></tr>
+      </tbody>
+    </table>
+    <p class="install-note" style="text-align:left;margin-top:1rem;">Both models are <em>identical to four decimal places</em> — when 98.6% of queries skip the LLM entirely, model size literally cannot matter.</p>
   </section>
 
   <section class="step-section">
@@ -109,6 +123,7 @@
       The adversarial eval contains 204 intents engineered to mislead the router:
       surface-level keywords pointing to tool A while the semantic core is tool B
       (intent confusion, false friends, ambiguous scope, negation traps).
+      All numbers below use the <code>clibrary_top3</code> strategy.
     </p>
 
     <table>
@@ -123,9 +138,21 @@
       </tbody>
     </table>
 
+    <p>Final result on the post-R3 index, both models:</p>
+
+    <table>
+      <thead>
+        <tr><th>Model</th><th>N</th><th class="num">CLI Acc</th><th class="num">Top-3</th><th class="num">Pick</th><th class="num">Params</th><th class="num">E2E</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>qwen2.5:3b</td><td class="muted">204</td><td class="num">84.31%</td><td class="num">100%</td><td class="num">84.31%</td><td class="num">86.27%</td><td class="num">77.94%</td></tr>
+        <tr><td>qwen2.5:14b</td><td class="muted">204</td><td class="num">86.27%</td><td class="num">100%</td><td class="num">86.27%</td><td class="num">87.75%</td><td class="num">79.90%</td></tr>
+      </tbody>
+    </table>
+
     <div class="callout">
       <strong>3 rounds of trigger patching turned the adversarial set into a perfect-recall problem.</strong>
-      <p style="margin-top:0.6rem;">No model fine-tuning. The remaining 13.7pp gap between CLI Acc and Top-3 Acc is LLM selection error, not retrieval error.</p>
+      <p style="margin-top:0.6rem;">Top-3 = 100% means the right tool is always in the top three; the remaining gap (CLI Acc 84–86%) is the LLM picking wrong from those three. Bigger model helps slightly here (+1.96 pp) — the only place we see model size matter.</p>
     </div>
   </section>
 
@@ -133,13 +160,13 @@
     <h2>Other eval sets (qwen2.5:3b)</h2>
     <table>
       <thead>
-        <tr><th>Eval</th><th>N</th><th class="num">CLI Acc</th><th class="num">Top-3</th><th class="num">E2E</th></tr>
+        <tr><th>Eval</th><th>Strategy</th><th>N</th><th class="num">CLI Acc</th><th class="num">Top-3</th><th class="num">E2E</th></tr>
       </thead>
       <tbody>
-        <tr><td>in_domain</td><td class="muted">500</td><td class="num">~91%</td><td class="num">~95%</td><td class="num">—</td></tr>
-        <tr><td>paraphrase</td><td class="muted">1,500</td><td class="num">81.80%</td><td class="num">83.40%</td><td class="num">61.27%</td></tr>
-        <tr><td>cross_domain</td><td class="muted">328</td><td class="num">68.9%</td><td class="num">—</td><td class="num">67.7%</td></tr>
-        <tr><td>adversarial (post R3)</td><td class="muted">204</td><td class="num">86.3%</td><td class="num">100%</td><td class="num">79.9%</td></tr>
+        <tr><td>in_domain</td><td>clibrary</td><td class="muted">500</td><td class="num">86.80%</td><td class="num">88.00%</td><td class="num">65.20%</td></tr>
+        <tr><td>paraphrase</td><td>clibrary</td><td class="muted">1,500</td><td class="num">81.80%</td><td class="num">83.40%</td><td class="num">61.27%</td></tr>
+        <tr><td>cross_domain</td><td>clibrary</td><td class="muted">328</td><td class="num">68.90%</td><td class="num">—</td><td class="num">67.70%</td></tr>
+        <tr><td>adversarial (post R3)</td><td>clibrary_top3</td><td class="muted">204</td><td class="num">84.31%</td><td class="num">100%</td><td class="num">77.94%</td></tr>
       </tbody>
     </table>
   </section>
