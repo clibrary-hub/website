@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/style.css">
 <script src="/assets/parallax.js" defer></script>
+<script src="/assets/flow.js" defer></script>
 </head>
 <body>
 
@@ -75,33 +76,121 @@
   </div>
 </div>
 
-<div class="terminal-wrap" id="how">
-  <div class="terminal">
-    <div class="terminal-bar">
-      <div class="dot dot-r"></div>
-      <div class="dot dot-y"></div>
-      <div class="dot dot-g"></div>
-      <span class="terminal-title">clibrary_hub — Python</span>
+<!-- Feature row 1 — 人類使用者 -->
+<section class="feature-row human-side" id="how">
+  <div class="feature-text">
+    <div class="feature-tag">一般使用者 · 過程視角</div>
+    <h2>直接呼叫<br>看著結果回來</h2>
+    <p class="feature-lead">
+      在 Python REPL、notebook 或自己的工具裡呼叫 router。輸入一段自然語言，
+      終端機就回傳一個結構化的 tool-call 物件——cli 名稱、參數、confidence
+      你自己決定要怎麼跑這個指令，沒有任何魔法
+    </p>
+    <a class="feature-cta" href="https://github.com/clibrary-hub/CLIbrary">看原始碼</a>
+  </div>
+  <div class="feature-demo flow-col human" data-lang="zh">
+    <div class="term-window">
+      <div class="term-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="term-title">輸入 · 你打的字</span>
+      </div>
+      <div class="term-pane h-input" data-pane="input"></div>
     </div>
-    <div class="terminal-body">
-      <div><span class="line-comment"># 把 manifests 一次建成 FAISS 索引</span></div>
-      <div><span class="line-prompt">$ </span><span class="line-cmd">clibrary-build-index --manifest-dir ./manifests</span></div>
-      <br>
-      <div><span class="line-comment"># 然後把任何自然語言意圖丟給 router</span></div>
-      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">from clibrary_hub import router</span></div>
-      <div><span class="line-prompt">&gt;&gt;&gt; </span><span class="line-cmd">router.route("查上週銷售總額")</span></div>
-      <br>
-      <div><span class="line-out">{</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"action"</span><span class="line-out">: </span><span class="line-val">"route"</span><span class="line-out">,</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"cli"</span><span class="line-out">: </span><span class="line-val">"sql-runner"</span><span class="line-out">,</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"params"</span><span class="line-out">: { </span><span class="line-key">"query"</span><span class="line-out">: </span><span class="line-val">"SELECT SUM(amount) ..."</span><span class="line-out"> },</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"confidence"</span><span class="line-out">: </span><span class="line-val">0.94</span><span class="line-out">,</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"source"</span><span class="line-out">: </span><span class="line-val">"A"</span><span class="line-out">,&nbsp;&nbsp;</span><span class="line-comment"># 模板套用，沒呼叫 LLM</span></div>
-      <div><span class="line-out">&nbsp;&nbsp;</span><span class="line-key">"latency_ms"</span><span class="line-out">: </span><span class="line-val">36</span></div>
-      <div><span class="line-out">}</span></div>
+    <div class="term-window">
+      <div class="term-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="term-title">終端機 · 回傳的東西</span>
+      </div>
+      <div class="term-pane h-output" data-pane="output"></div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- Feature row 2 — LLM AGENT -->
+<section class="feature-row agent-side reverse">
+  <div class="feature-text">
+    <div class="feature-tag">LLM AGENT · 用戶視角</div>
+    <h2>同一個 call<br>包成自然對話</h2>
+    <p class="feature-lead">
+      在 agent 迴圈裡，router 一樣回傳結構化物件——但用戶從頭到尾看不到 raw JSON
+      Agent 讀候選、選一個、執行工具、再用自然語言回報結果
+      不需要把工具描述塞進 prompt，token 不會爆
+    </p>
+    <a class="feature-cta" href="/zh/create.html">寫一個 manifest</a>
+  </div>
+  <div class="feature-demo flow-col agent" data-lang="zh">
+    <div class="term-window">
+      <div class="term-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="term-title">agent</span>
+      </div>
+      <div class="term-pane agent"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Developer quickstart -->
+<section class="quickstart-section" id="quickstart">
+  <h2 class="quickstart-title">今天就開始建</h2>
+  <div class="quickstart-card">
+    <div class="quickstart-side">
+      <h3>開發者快速入門</h3>
+      <p>裝套件、建 index、route 第一個意圖三步驟，大約 5 分鐘</p>
+      <span class="quickstart-meta">⏱ 約 5 分鐘</span>
+      <br>
+      <a class="feature-cta" href="https://pypi.org/project/clibrary-hub/">PyPI 頁面</a>
+    </div>
+
+    <div class="quickstart-code">
+      <div class="qs-tabs" id="qs-tabs">
+        <button class="qs-tab active" data-tab="route">Route</button>
+        <button class="qs-tab" data-tab="validate">Validate</button>
+        <button class="qs-tab" data-tab="agent">Agent 用法</button>
+      </div>
+
+      <div class="qs-panel active" data-panel="route"><pre><code><span class="qs-com"># pip install clibrary-hub</span>
+<span class="qs-com"># clibrary-build-index --manifest-dir ./manifests</span>
+
+<span class="qs-key">from</span> <span class="qs-imp">clibrary_hub</span> <span class="qs-key">import</span> <span class="qs-imp">router</span>
+
+result = router.<span class="qs-fn">route</span>(<span class="qs-str">"把 demo.mp4 轉成 10fps 的 gif"</span>)
+
+<span class="qs-fn">print</span>(result[<span class="qs-str">"cli"</span>])         <span class="qs-com"># 'video-to-gif'</span>
+<span class="qs-fn">print</span>(result[<span class="qs-str">"params"</span>])      <span class="qs-com"># {'input': 'demo.mp4', ...}</span>
+<span class="qs-fn">print</span>(result[<span class="qs-str">"confidence"</span>])  <span class="qs-com"># 0.94</span></code></pre></div>
+
+      <div class="qs-panel" data-panel="validate"><pre><code><span class="qs-key">from</span> <span class="qs-imp">clibrary_hub</span> <span class="qs-key">import</span> <span class="qs-imp">validator</span>
+
+r = validator.<span class="qs-fn">validate_file</span>(<span class="qs-str">"manifests/data/sql-runner.json"</span>)
+
+<span class="qs-key">if</span> <span class="qs-key">not</span> r.ok:
+    <span class="qs-key">for</span> e <span class="qs-key">in</span> r.errors:   <span class="qs-fn">print</span>(<span class="qs-str">"ERROR:"</span>, e)
+    <span class="qs-key">for</span> w <span class="qs-key">in</span> r.warnings: <span class="qs-fn">print</span>(<span class="qs-str">"WARN: "</span>, w)
+
+<span class="qs-com"># 一次驗證整個資料夾下的 manifest:</span>
+results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str">"manifests/"</span>)</code></pre></div>
+
+      <div class="qs-panel" data-panel="agent"><pre><code><span class="qs-key">from</span> <span class="qs-imp">clibrary_hub</span> <span class="qs-key">import</span> <span class="qs-imp">router</span>
+<span class="qs-key">import</span> <span class="qs-imp">subprocess</span>
+
+<span class="qs-key">def</span> <span class="qs-fn">handle_user</span>(message: <span class="qs-imp">str</span>):
+    plan = router.<span class="qs-fn">route</span>(message)
+
+    <span class="qs-key">if</span> plan[<span class="qs-str">"action"</span>] == <span class="qs-str">"clarify"</span>:
+        <span class="qs-com"># 讓你的 LLM 從 plan["choices"] 裡選一個</span>
+        plan = <span class="qs-fn">llm_pick</span>(plan[<span class="qs-str">"choices"</span>], chat_history)
+
+    cmd = [plan[<span class="qs-str">"cli"</span>]] + <span class="qs-fn">flatten</span>(plan[<span class="qs-str">"params"</span>])
+    <span class="qs-key">return</span> subprocess.<span class="qs-fn">run</span>(cmd, check=<span class="qs-num2">True</span>)</code></pre></div>
+    </div>
+  </div>
+</section>
 
 <hr class="divider">
 
