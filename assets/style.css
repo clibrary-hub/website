@@ -702,15 +702,16 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
 }
 
 .term-window {
-  background: var(--surface);
+  background: #0a0e13;            /* solid, darker than surface for contrast */
   border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
   font-family: var(--mono);
   font-size: 0.92rem;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.5),
-    0 0 80px rgba(0, 229, 160, 0.06);
+  position: relative;
+  z-index: 2;                     /* sits clearly above bg grid + nodes */
+  isolation: isolate;             /* new stacking context — no leakage */
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
 }
 .term-bar {
   background: #141c24;
@@ -719,6 +720,8 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
   align-items: center;
   gap: 0.5rem;
   border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
 }
 .term-title {
   font-size: 0.72rem;
@@ -734,6 +737,9 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
   line-height: 1.65;
   color: var(--text);
   font-size: 0.85rem;
+  background: #0a0e13;            /* explicit solid background */
+  position: relative;
+  z-index: 1;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
