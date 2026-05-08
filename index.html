@@ -55,7 +55,7 @@
 <div class="hero">
   <div class="badge">v0.2.0 — NOW ON PYPI</div>
 
-  <h1>Tool routing for<br><span>AI agents</span>.</h1>
+  <h1>Tool routing for<br><span>AI agents</span></h1>
 
   <p class="hero-sub">
     Two-stage embedding router that picks the right CLI from hundreds of tools
@@ -86,7 +86,7 @@
 <section class="feature-row human-side" id="how">
   <div class="feature-text">
     <div class="feature-tag">HUMAN · PROCESS VIEW</div>
-    <h2>Call it directly.<br>See what comes back.</h2>
+    <h2>Call it directly<br>See what comes back</h2>
     <p class="feature-lead">
       Use the router from a Python REPL, a notebook, or your own tool.
       You type an intent, the terminal returns a structured tool-call object —
@@ -120,7 +120,7 @@
 <section class="feature-row agent-side reverse">
   <div class="feature-text">
     <div class="feature-tag">LLM AGENT · USER VIEW</div>
-    <h2>Wrap the same call<br>for a real conversation.</h2>
+    <h2>Wrap the same call<br>for a real conversation</h2>
     <p class="feature-lead">
       Inside an agent loop the router still returns a structured object — but the
       user never sees raw JSON. The agent reads choices, picks one, runs the tool,
@@ -143,7 +143,7 @@
 
 <!-- Developer quickstart -->
 <section class="quickstart-section" id="quickstart">
-  <h2 class="quickstart-title">Start building today.</h2>
+  <h2 class="quickstart-title">Start building today</h2>
   <div class="quickstart-card">
     <div class="quickstart-side">
       <h3>Developer quickstart</h3>
@@ -202,7 +202,7 @@ results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str"
 
 <section class="block">
   <p class="section-label">WHY EMBEDDING ROUTING</p>
-  <h2 class="section-title">Stuffing tools<br>into prompts breaks at scale.</h2>
+  <h2 class="section-title">Stuffing tools<br>into prompts breaks at scale</h2>
   <p class="section-sub">When an agent has 100+ tools, the LLM has to read every description before picking one. Token cost, latency, and accuracy all degrade.</p>
 
   <div class="compare">
@@ -227,7 +227,7 @@ results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str"
 
 <section class="block">
   <p class="section-label">PERFORMANCE</p>
-  <h2 class="section-title">Measured, not promised.</h2>
+  <h2 class="section-title">Measured, not promised</h2>
   <p class="section-sub">Evaluated against 2,050 queries spanning 559 CLI tools (CLIbrary + MCP). Numbers from the latest router build (clibrary_top3 strategy, multilingual-e5-base).</p>
 
   <table>
@@ -251,7 +251,7 @@ results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str"
 
 <section class="block">
   <p class="section-label">HOW IT WORKS</p>
-  <h2 class="section-title">Two stages,<br>three indices.</h2>
+  <h2 class="section-title">Two stages,<br>three indices</h2>
   <p class="section-sub">Stage 1 retrieves candidate CLIs via FAISS. Stage 2 matches the closest example template. ~80% of queries skip the LLM entirely.</p>
 
   <div class="cards">
@@ -277,7 +277,7 @@ results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str"
 
 <section class="block">
   <p class="section-label">MANIFESTS</p>
-  <h2 class="section-title">Every CLI as<br>a single JSON file.</h2>
+  <h2 class="section-title">Every CLI as<br>a single JSON file</h2>
   <p class="section-sub">A manifest describes one tool: what it does, when to use it, what it expects, what it returns. Manifests live in their own MIT-licensed registry.</p>
 
   <div class="categories">
