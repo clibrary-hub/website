@@ -87,48 +87,61 @@
   <h2>The same call, <span>two views</span>.</h2>
   <p class="section-sub">Left: what a developer sees — typed code in, JSON out. Right: what an LLM agent's user sees — natural language, options, progress. The library underneath is the exact same.</p>
 
-  <div class="flow-dual">
+  <div class="flow-tabs" id="flow-tabs">
+    <button class="flow-tab active" data-idx="0"><span class="tab-tag">●</span>HUMAN · PROCESS</button>
+    <button class="flow-tab" data-idx="1"><span class="tab-tag">●</span>LLM AGENT · USER VIEW</button>
+  </div>
 
-    <div class="flow-col human" data-lang="en">
-      <div class="flow-col-label">HUMAN · PROCESS</div>
-      <p class="flow-col-tagline">You type. The terminal returns JSON. The router stays out of your way.</p>
+  <div class="flow-carousel">
+    <div class="flow-track" id="flow-track" data-idx="0">
 
-      <div class="term-window">
-        <div class="term-bar">
-          <div class="dot dot-r"></div>
-          <div class="dot dot-y"></div>
-          <div class="dot dot-g"></div>
-          <span class="term-title">input · what you type</span>
+      <div class="flow-slide">
+        <div class="flow-col human" data-lang="en">
+          <p class="flow-col-tagline">You type. The terminal returns JSON. Two windows, one session.</p>
+
+          <div class="term-window">
+            <div class="term-bar">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+              <span class="term-title">input · what you type</span>
+            </div>
+            <div class="term-pane h-input" data-pane="input"></div>
+          </div>
+
+          <div class="term-window">
+            <div class="term-bar">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+              <span class="term-title">terminal · what comes back</span>
+            </div>
+            <div class="term-pane h-output" data-pane="output"></div>
+          </div>
         </div>
-        <div class="term-pane h-input" data-pane="input"></div>
       </div>
 
-      <div class="term-window">
-        <div class="term-bar">
-          <div class="dot dot-r"></div>
-          <div class="dot dot-y"></div>
-          <div class="dot dot-g"></div>
-          <span class="term-title">terminal · what comes back</span>
+      <div class="flow-slide">
+        <div class="flow-col agent" data-lang="en">
+          <p class="flow-col-tagline">No JSON. The agent translates everything into a natural reply: status, choices, progress, done.</p>
+
+          <div class="term-window">
+            <div class="term-bar">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+              <span class="term-title">agent</span>
+            </div>
+            <div class="term-pane agent"></div>
+          </div>
         </div>
-        <div class="term-pane h-output" data-pane="output"></div>
       </div>
+
     </div>
+  </div>
 
-    <div class="flow-col agent" data-lang="en">
-      <div class="flow-col-label">LLM AGENT · USER VIEW</div>
-      <p class="flow-col-tagline">No JSON. The agent translates everything into a natural reply: status, choices, progress, done.</p>
-
-      <div class="term-window">
-        <div class="term-bar">
-          <div class="dot dot-r"></div>
-          <div class="dot dot-y"></div>
-          <div class="dot dot-g"></div>
-          <span class="term-title">agent</span>
-        </div>
-        <div class="term-pane agent"></div>
-      </div>
-    </div>
-
+  <div class="flow-progress" aria-hidden="true">
+    <div class="flow-progress-bar" id="flow-progress-bar"></div>
   </div>
 </section>
 

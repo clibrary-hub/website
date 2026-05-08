@@ -266,18 +266,89 @@
   const humanCol = document.querySelector('.flow-col.human');
   const agentCol = document.querySelector('.flow-col.agent');
 
+  // Both runners are kept alive — they animate continuously.
+  // The carousel just changes which one is visible.
   if (humanCol) {
     const r = startHumanRunner(humanCol);
     new IntersectionObserver(
       (es) => { es[0]?.isIntersecting ? r.start() : r.stop(); },
-      { threshold: 0.15 }
-    ).observe(humanCol);
+      { threshold: 0.05 }
+    ).observe(document.querySelector('.flow-wrap') || humanCol);
   }
   if (agentCol) {
     const r = startAgentRunner(agentCol);
     new IntersectionObserver(
       (es) => { es[0]?.isIntersecting ? r.start() : r.stop(); },
-      { threshold: 0.15 }
-    ).observe(agentCol);
+      { threshold: 0.05 }
+    ).observe(document.querySelector('.flow-wrap') || agentCol);
+  }
+
+  // ── Carousel ───────────────────────────────────────────────────────────
+  const track   = document.getElementById('flow-track');
+  const tabs    = document.querySelectorAll('.flow-tab');
+  const progBar = document.getElementById('flow-progress-bar');
+
+  if (track && tabs.length) {
+    const SLIDES = tabs.length;
+    const DURATION = 18000;     // ms each slide stays before auto-advance
+    let current = 0;
+    let timer = null;
+    let progressStart = 0;
+    let progressFrame = null;
+    let userInteracted = false;
+
+    function setSlide(i) {
+      current = i % SLIDES;
+      track.dataset.idx = String(current);
+      tabs.forEach((t, idx) => t.classList.toggle('active', idx === current));
+    }
+
+    function tickProgress() {
+      const elapsed = Date.now() - progressStart;
+      const pct = Math.min(100, (elapsed / DURATION) * 100);
+      if (progBar) progBar.style.width = pct + '%';
+      if (pct < 100) progressFrame = requestAnimationFrame(tickProgress);
+    }
+
+    function scheduleAuto() {
+      clearTimeout(timer);
+      cancelAnimationFrame(progressFrame);
+      progressStart = Date.now();
+      if (progBar) progBar.style.width = '0%';
+      progressFrame = requestAnimationFrame(tickProgress);
+
+      timer = setTimeout(() => {
+        if (!userInteracted) {
+          setSlide((current + 1) % SLIDES);
+          scheduleAuto();
+        }
+      }, DURATION);
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const i = parseInt(tab.dataset.idx, 10);
+        setSlide(i);
+        scheduleAuto();          // restart timer after manual click
+      });
+    });
+
+    // Pause auto-advance when section is off-screen.
+    const wrap = document.querySelector('.flow-wrap');
+    if (wrap) {
+      const obs = new IntersectionObserver(
+        (es) => {
+          if (es[0]?.isIntersecting) scheduleAuto();
+          else {
+            clearTimeout(timer);
+            cancelAnimationFrame(progressFrame);
+          }
+        },
+        { threshold: 0.15 }
+      );
+      obs.observe(wrap);
+    } else {
+      scheduleAuto();
+    }
   }
 })();

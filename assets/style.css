@@ -820,19 +820,79 @@ tr.highlight td.num { color: var(--accent); font-weight: bold; }
 .t-tool-name { color: var(--text); font-weight: 700; }
 .t-tool-desc { color: var(--muted); }
 
-/* Dual-pane terminal layout */
-.flow-dual {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+/* ── Carousel ─────────────────────────────────────────────────── */
+.flow-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
-@media (max-width: 900px) {
-  .flow-dual { grid-template-columns: 1fr; }
+.flow-tab {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  padding: 0.55rem 1.1rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.flow-tab:hover { color: var(--text); border-color: var(--muted); }
+.flow-tab.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 18px rgba(0, 229, 160, 0.18);
+}
+.flow-tab .tab-tag {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  margin-right: 0.4rem;
+}
+
+.flow-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.flow-track {
+  display: flex;
+  width: 200%;
+  transition: transform 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.flow-track[data-idx="0"] { transform: translateX(0); }
+.flow-track[data-idx="1"] { transform: translateX(-50%); }
+
+.flow-slide {
+  width: 50%;
+  flex: 0 0 50%;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
 }
 
 .flow-col {
   display: flex;
   flex-direction: column;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.flow-progress {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  margin-top: 1.5rem;
+  overflow: hidden;
+}
+.flow-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.3s linear;
+  box-shadow: 0 0 10px var(--accent);
 }
 
 .flow-col-label {
