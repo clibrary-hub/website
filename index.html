@@ -39,7 +39,7 @@
   <div class="logo"><a href="/">CLIbrary<span>-Hub</span></a></div>
   <div class="nav-links">
     <a href="/benchmark.html">Benchmark</a>
-    <a href="/create.html">Write a Manifest</a>
+    <a href="/create.html" class="nav-secondary">Write a Manifest</a>
     <span class="nav-divider"></span>
     <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
     <div class="lang-switch" id="lang-switch">
@@ -275,28 +275,56 @@ results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str"
 
 <hr class="divider">
 
-<section class="block">
-  <p class="section-label">MANIFESTS</p>
-  <h2 class="section-title">Every CLI as<br>a single JSON file</h2>
-  <p class="section-sub">A manifest describes one tool: what it does, when to use it, what it expects, what it returns. Manifests live in their own MIT-licensed registry.</p>
+<section class="extend-section">
+  <div class="extend-grid">
+    <div class="extend-text">
+      <p class="section-label">EXTEND · USER-AUTHORED TOOLS</p>
+      <h2 class="section-title">The router is only<br>as smart as its tools</h2>
+      <p class="section-sub" style="max-width:none;margin-bottom:0;">
+        Other tool routers ship a fixed catalog. clibrary-hub ships a <strong style="color:var(--text);">format</strong>.
+        Anyone can describe a CLI in 10 minutes and the router picks it up.
+      </p>
 
-  <div class="categories">
-    <div class="cat">ai-ml</div>
-    <div class="cat">devops</div>
-    <div class="cat">data</div>
-    <div class="cat">web</div>
-    <div class="cat">security</div>
-    <div class="cat">media</div>
-    <div class="cat">productivity</div>
-    <div class="cat">finance</div>
-    <div class="cat">science</div>
-    <div class="cat">networking</div>
+      <ul class="extend-bullets">
+        <li>One JSON file per tool — no Python registration, no class hierarchy</li>
+        <li>5+ <code>intent_triggers</code> in any languages your users speak</li>
+        <li>Schema-validated offline by <code>clibrary_hub.validator</code> — no PR needed</li>
+        <li>3–5 examples become Path-A templates — zero LLM cost on common queries</li>
+      </ul>
+
+      <div class="extend-cta-row">
+        <a href="/create.html" class="extend-cta-primary">Write your first manifest</a>
+        <a href="https://github.com/clibrary-hub/manifests" class="feature-cta">Browse 504 existing</a>
+      </div>
+    </div>
+
+    <div class="extend-preview">
+      <span class="extend-preview-label">manifests/media/video-to-gif.json</span>
+<pre style="margin:0;background:transparent;border:none;padding:0;font-size:0.82rem;line-height:1.7;"><code>{
+  <span class="k">"name"</span>:        <span class="s">"video-to-gif"</span>,
+  <span class="k">"category"</span>:    <span class="s">"media"</span>,
+  <span class="k">"description"</span>: <span class="s">"Convert a video file to an animated GIF"</span>,
+
+  <span class="k">"intent_triggers"</span>: [
+    <span class="s">"convert mp4 to gif"</span>,
+    <span class="s">"turn this video into a gif"</span>,
+    <span class="s">"export the first 5 seconds as a gif"</span>,
+    <span class="s">"把影片轉成 gif"</span>,
+    <span class="s">"幫我做一個動圖"</span>
+  ],
+
+  <span class="k">"input_schema"</span>: {
+    <span class="k">"input"</span>:  { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"required"</span>: true },
+    <span class="k">"fps"</span>:    { <span class="k">"type"</span>: <span class="s">"integer"</span>, <span class="k">"default"</span>: <span class="s">15</span> }
+  },
+
+  <span class="k">"examples"</span>: [...] <span class="c">// 3-5 templates</span>
+}</code></pre>
+    </div>
   </div>
 
-  <p class="install-note" style="text-align:left; margin-top:2rem;">
-    Browse the registry on
-    <a href="https://github.com/clibrary-hub/manifests">GitHub</a>,
-    or <a href="/create.html">write your own manifest →</a>
+  <p class="install-note" style="text-align:center; margin-top:2.5rem; max-width:none;">
+    10 categories · 504 manifests so far · MIT-licensed registry
   </p>
 </section>
 

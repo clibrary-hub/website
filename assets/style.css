@@ -261,6 +261,33 @@ nav a:hover { color: var(--accent); }
   box-shadow: 0 0 18px rgba(0, 229, 160, 0.18);
 }
 
+/* Secondary CTA — used for 'Write a Manifest' to elevate it
+   above the plain Benchmark link without competing with the
+   primary pip install button */
+.nav-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.95rem;
+  border-radius: 4px;
+  color: var(--text) !important;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+}
+.nav-secondary::before {
+  content: '+';
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+}
+.nav-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent) !important;
+  background: var(--accent-dim);
+}
+
 .lang-active { color: var(--accent) !important; }
 
 @media (max-width: 720px) {
@@ -1272,6 +1299,101 @@ section.block > * {
 .compare-row span:last-child { font-family: var(--mono); font-size: 0.82rem; }
 .good { color: var(--accent); }
 .bad { color: #f87171; }
+
+/* ============================================================
+   Extend section — promote manifest authoring
+   ============================================================ */
+.extend-section {
+  position: relative;
+  z-index: 2;
+  max-width: none;
+  padding: 5rem 2rem;
+}
+.extend-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 4rem;
+  align-items: center;
+}
+@media (max-width: 920px) {
+  .extend-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+.extend-text .section-title { margin-bottom: 1.2rem; }
+.extend-bullets {
+  list-style: none;
+  margin: 1.5rem 0;
+  padding: 0;
+}
+.extend-bullets li {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.92rem;
+}
+.extend-bullets li:last-child { border-bottom: none; }
+.extend-bullets li::before {
+  content: '✓';
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.extend-cta-row {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+  align-items: center;
+}
+.extend-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  background: var(--accent);
+  color: #060a0f !important;
+  padding: 0.85rem 1.4rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid var(--accent);
+  transition: all 0.2s;
+}
+.extend-cta-primary::after { content: '→'; }
+.extend-cta-primary:hover {
+  box-shadow: 0 0 24px rgba(0, 229, 160, 0.5);
+  transform: translateY(-1px);
+}
+
+.extend-preview {
+  background: #0a0e13;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.4rem 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--text);
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+}
+.extend-preview-label {
+  font-size: 0.7rem;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.8rem;
+  display: block;
+}
+.extend-preview .k { color: #7dd3fc; }
+.extend-preview .s { color: #86efac; }
+.extend-preview .c { color: #6b7280; font-style: italic; }
 
 /* ============================================================
    Categories

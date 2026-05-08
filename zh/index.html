@@ -33,7 +33,7 @@
   <div class="logo"><a href="/zh/">CLIbrary<span>-Hub</span></a></div>
   <div class="nav-links">
     <a href="/zh/benchmark.html">效能評測</a>
-    <a href="/zh/create.html">寫一個 Manifest</a>
+    <a href="/zh/create.html" class="nav-secondary">寫一個 Manifest</a>
     <span class="nav-divider"></span>
     <a href="https://pypi.org/project/clibrary-hub/" class="nav-cta">pip install</a>
     <div class="lang-switch" id="lang-switch">
@@ -269,27 +269,56 @@ results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str"
 
 <hr class="divider">
 
-<section class="block">
-  <p class="section-label">MANIFESTS</p>
-  <h2 class="section-title">每個 CLI<br>就是一個 JSON 檔</h2>
-  <p class="section-sub">Manifest 描述一個工具：做什麼、何時用、需要什麼、回傳什麼Manifests 放在獨立的 MIT 授權註冊表</p>
+<section class="extend-section">
+  <div class="extend-grid">
+    <div class="extend-text">
+      <p class="section-label">EXTEND · 使用者自定義工具</p>
+      <h2 class="section-title">Router 有多聰明<br>取決於工具有多齊</h2>
+      <p class="section-sub" style="max-width:none;margin-bottom:0;">
+        其他 tool router 給你一份固定的工具清單clibrary-hub 給你的是<strong style="color:var(--text);">一份格式</strong>
+        任何人花 10 分鐘寫一個 JSON，router 自動接進來
+      </p>
 
-  <div class="categories">
-    <div class="cat">ai-ml</div>
-    <div class="cat">devops</div>
-    <div class="cat">data</div>
-    <div class="cat">web</div>
-    <div class="cat">security</div>
-    <div class="cat">media</div>
-    <div class="cat">productivity</div>
-    <div class="cat">finance</div>
-    <div class="cat">science</div>
-    <div class="cat">networking</div>
+      <ul class="extend-bullets">
+        <li>一個工具一個 JSON 檔——不用 Python 註冊、不用繼承類別</li>
+        <li>5 條以上 <code>intent_triggers</code>，使用者用什麼語言講就寫什麼語言</li>
+        <li>用 <code>clibrary_hub.validator</code> 在本地驗 schema——不用送 PR</li>
+        <li>3–5 個 examples 自動變成 Path A 模板，常見問法零 LLM 成本</li>
+      </ul>
+
+      <div class="extend-cta-row">
+        <a href="/zh/create.html" class="extend-cta-primary">寫第一個 manifest</a>
+        <a href="https://github.com/clibrary-hub/manifests" class="feature-cta">看現有 504 個</a>
+      </div>
+    </div>
+
+    <div class="extend-preview">
+      <span class="extend-preview-label">manifests/media/video-to-gif.json</span>
+<pre style="margin:0;background:transparent;border:none;padding:0;font-size:0.82rem;line-height:1.7;"><code>{
+  <span class="k">"name"</span>:        <span class="s">"video-to-gif"</span>,
+  <span class="k">"category"</span>:    <span class="s">"media"</span>,
+  <span class="k">"description"</span>: <span class="s">"Convert a video file to an animated GIF"</span>,
+
+  <span class="k">"intent_triggers"</span>: [
+    <span class="s">"convert mp4 to gif"</span>,
+    <span class="s">"turn this video into a gif"</span>,
+    <span class="s">"export the first 5 seconds as a gif"</span>,
+    <span class="s">"把影片轉成 gif"</span>,
+    <span class="s">"幫我做一個動圖"</span>
+  ],
+
+  <span class="k">"input_schema"</span>: {
+    <span class="k">"input"</span>:  { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"required"</span>: true },
+    <span class="k">"fps"</span>:    { <span class="k">"type"</span>: <span class="s">"integer"</span>, <span class="k">"default"</span>: <span class="s">15</span> }
+  },
+
+  <span class="k">"examples"</span>: [...] <span class="c">// 3-5 範本</span>
+}</code></pre>
+    </div>
   </div>
 
-  <p class="install-note" style="text-align:left; margin-top:2rem;">
-    上 <a href="https://github.com/clibrary-hub/manifests">GitHub</a> 瀏覽註冊表，
-    或 <a href="/zh/create.html">寫一個自己的 manifest →</a>
+  <p class="install-note" style="text-align:center; margin-top:2.5rem; max-width:none;">
+    10 個分類 · 目前 504 個 manifest · MIT 授權
   </p>
 </section>
 
