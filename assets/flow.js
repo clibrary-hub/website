@@ -38,14 +38,14 @@
     return div;
   }
 
-  async function typeIntoLine(screen, prefixHtml, text, runningRef) {
+  async function typeIntoLine(screen, prefixHtml, text, alive) {
     const line = appendTo(screen, prefixHtml);
     const caret = document.createElement('span');
     caret.className = 't-caret';
     line.appendChild(caret);
 
     for (const ch of text) {
-      if (!runningRef.value) return;
+      if (!alive()) return;
       line.insertBefore(document.createTextNode(ch), caret);
       screen.scrollTop = screen.scrollHeight;
       await delay(CHAR_DELAY + (Math.random() < 0.07 ? 90 : 0));
@@ -98,12 +98,17 @@
     const outputScreen = col.querySelector('.term-pane[data-pane="output"]');
     const lang = col.dataset.lang || 'en';
     const sequence = humanSequence(lang);
-    const running = { value: true };
 
-    async function play() {
-      while (running.value) {
+    // Token pattern — every start() bumps the token. The running play loop
+    // captures its own myToken; if the global token moves on (because of
+    // another start/stop), the old loop sees myToken !== token and exits.
+    let token = 0;
+
+    async function play(myToken) {
+      const alive = () => myToken === token;
+      while (alive()) {
         for (const step of sequence) {
-          if (!running.value) return;
+          if (!alive()) return;
           const targets = step.pane === 'both' ? [inputScreen, outputScreen]
                        : step.pane === 'input' ? [inputScreen]
                        : [outputScreen];
@@ -111,10 +116,11 @@
           if (step.kind === 'out') {
             for (const s of targets) appendTo(s, colorize(step.text));
           } else if (step.kind === 'cmd') {
-            for (const s of targets) await typeIntoLine(s, PROMPT, step.text, running);
+            for (const s of targets) await typeIntoLine(s, PROMPT, step.text, alive);
+            if (!alive()) return;
           } else if (step.kind === 'res') {
             for (const ln of step.lines) {
-              if (!running.value) return;
+              if (!alive()) return;
               for (const s of targets) appendTo(s, colorize(ln), 't-res');
               await delay(RES_LINE_GAP);
             }
@@ -127,7 +133,15 @@
       }
     }
 
-    return { start: () => { running.value = true; play(); }, stop: () => { running.value = false; } };
+    return {
+      start: () => {
+        token++;                      // invalidate any in-flight loop
+        inputScreen.innerHTML = '';   // clean slate
+        outputScreen.innerHTML = '';
+        play(token);
+      },
+      stop: () => { token++; }        // also invalidate; nothing new starts
+    };
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -177,7 +191,8 @@
     const screen = col.querySelector('.term-pane');
     const lang = col.dataset.lang || 'en';
     const T = agentSequence(lang);
-    const running = { value: true };
+
+    let token = 0;
 
     function chatLine(label, text, kind) {
       const cls = kind === 'user' ? 't-chat-user' : 't-chat-agent';
@@ -193,15 +208,15 @@
       const id = setInterval(() => { span.textContent = frames[++i % frames.length]; }, 80);
       return { stop: () => { clearInterval(id); div.remove(); } };
     }
-    function progressBar() {
-      const div = appendTo(screen, `<span class="t-status">▸ ${T.processing}</span>`);
+    function progressBar(alive) {
+      appendTo(screen, `<span class="t-status">▸ ${T.processing}</span>`);
       const bar = appendTo(screen, `<span class="t-progress"><span class="t-progress-fill" style="width:0%"></span></span> <span class="t-progress-pct">0%</span>`);
       const fill = bar.querySelector('.t-progress-fill');
       const pct  = bar.querySelector('.t-progress-pct');
       return {
         async run() {
           for (let p = 0; p <= 100; p += 5) {
-            if (!running.value) return;
+            if (!alive()) return;
             fill.style.width = p + '%';
             pct.textContent = p + '%';
             await delay(80);
@@ -224,21 +239,23 @@
       if (tools[0]) tools[0].classList.add('picked');
     }
 
-    async function play() {
-      while (running.value) {
+    async function play(myToken) {
+      const alive = () => myToken === token;
+      while (alive()) {
         screen.innerHTML = '';
 
         chatLine(T.userLabel, T.userMsg, 'user');
         await delay(900);
-        if (!running.value) return;
+        if (!alive()) return;
 
         const s = spinnerStart();
         await delay(900);
         s.stop();
+        if (!alive()) return;
 
         toolList();
         await delay(1400);
-        if (!running.value) return;
+        if (!alive()) return;
 
         appendTo(screen, `<span class="t-status-dim">${T.pickPrompt}</span>`);
         await delay(700);
@@ -246,9 +263,11 @@
         await delay(500);
         status(T.picked);
         await delay(700);
+        if (!alive()) return;
 
-        const pb = progressBar();
+        const pb = progressBar(alive);
         await pb.run();
+        if (!alive()) return;
         await delay(300);
 
         appendTo(screen, `<span class="t-good">${T.doneLine}</span>`);
@@ -259,7 +278,14 @@
       }
     }
 
-    return { start: () => { running.value = true; play(); }, stop: () => { running.value = false; } };
+    return {
+      start: () => {
+        token++;
+        screen.innerHTML = '';
+        play(token);
+      },
+      stop: () => { token++; }
+    };
   }
 
   // ── Bootstrap demo runners ─────────────────────────────────────────────
