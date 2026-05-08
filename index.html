@@ -82,66 +82,119 @@
   </div>
 </div>
 
-<section class="flow-wrap" id="flow">
-  <p class="section-label">LIVE DEMO</p>
-  <h2>The same call, <span>two views</span>.</h2>
-  <p class="section-sub">Left: what a developer sees — typed code in, JSON out. Right: what an LLM agent's user sees — natural language, options, progress. The library underneath is the exact same.</p>
-
-  <div class="flow-tabs" id="flow-tabs">
-    <button class="flow-tab active" data-idx="0"><span class="tab-tag">●</span>HUMAN · PROCESS</button>
-    <button class="flow-tab" data-idx="1"><span class="tab-tag">●</span>LLM AGENT · USER VIEW</button>
+<!-- Feature row 1 — HUMAN side, text-left / demo-right -->
+<section class="feature-row human-side" id="how">
+  <div class="feature-text">
+    <div class="feature-tag">HUMAN · PROCESS VIEW</div>
+    <h2>Call it directly.<br>See what comes back.</h2>
+    <p class="feature-lead">
+      Use the router from a Python REPL, a notebook, or your own tool.
+      You type an intent, the terminal returns a structured tool-call object —
+      cli name, params, confidence. You run the command yourself. No magic.
+    </p>
+    <a class="feature-cta" href="https://github.com/clibrary-hub/CLIbrary">See the source</a>
   </div>
-
-  <div class="flow-carousel">
-    <div class="flow-track" id="flow-track" data-idx="0">
-
-      <div class="flow-slide">
-        <div class="flow-col human" data-lang="en">
-          <p class="flow-col-tagline">You type. The terminal returns JSON. Two windows, one session.</p>
-
-          <div class="term-window">
-            <div class="term-bar">
-              <div class="dot dot-r"></div>
-              <div class="dot dot-y"></div>
-              <div class="dot dot-g"></div>
-              <span class="term-title">input · what you type</span>
-            </div>
-            <div class="term-pane h-input" data-pane="input"></div>
-          </div>
-
-          <div class="term-window">
-            <div class="term-bar">
-              <div class="dot dot-r"></div>
-              <div class="dot dot-y"></div>
-              <div class="dot dot-g"></div>
-              <span class="term-title">terminal · what comes back</span>
-            </div>
-            <div class="term-pane h-output" data-pane="output"></div>
-          </div>
-        </div>
+  <div class="feature-demo flow-col human" data-lang="en">
+    <div class="term-window">
+      <div class="term-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="term-title">input · what you type</span>
       </div>
-
-      <div class="flow-slide">
-        <div class="flow-col agent" data-lang="en">
-          <p class="flow-col-tagline">No JSON. The agent translates everything into a natural reply: status, choices, progress, done.</p>
-
-          <div class="term-window">
-            <div class="term-bar">
-              <div class="dot dot-r"></div>
-              <div class="dot dot-y"></div>
-              <div class="dot dot-g"></div>
-              <span class="term-title">agent</span>
-            </div>
-            <div class="term-pane agent"></div>
-          </div>
-        </div>
+      <div class="term-pane h-input" data-pane="input"></div>
+    </div>
+    <div class="term-window">
+      <div class="term-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="term-title">terminal · what comes back</span>
       </div>
-
+      <div class="term-pane h-output" data-pane="output"></div>
     </div>
   </div>
+</section>
 
-  <div class="flow-progress" aria-hidden="true">
-    <div class="flow-progress-bar" id="flow-progress-bar"></div>
+<!-- Feature row 2 — LLM AGENT side, demo-left / text-right (zigzag) -->
+<section class="feature-row agent-side reverse">
+  <div class="feature-text">
+    <div class="feature-tag">LLM AGENT · USER VIEW</div>
+    <h2>Wrap the same call<br>for a real conversation.</h2>
+    <p class="feature-lead">
+      Inside an agent loop the router still returns a structured object — but the
+      user never sees raw JSON. The agent reads choices, picks one, runs the tool,
+      and reports back in plain language. No prompt-stuffing, no token blowup.
+    </p>
+    <a class="feature-cta" href="/create.html">Write a manifest</a>
+  </div>
+  <div class="feature-demo flow-col agent" data-lang="en">
+    <div class="term-window">
+      <div class="term-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="term-title">agent</span>
+      </div>
+      <div class="term-pane agent"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Developer quickstart -->
+<section class="quickstart-section" id="quickstart">
+  <h2 class="quickstart-title">Start building today.</h2>
+  <div class="quickstart-card">
+    <div class="quickstart-side">
+      <h3>Developer quickstart</h3>
+      <p>Install the package, build the index, route your first intent. Three steps, about five minutes.</p>
+      <span class="quickstart-meta">⏱ ~5 min</span>
+      <br>
+      <a class="feature-cta" href="https://pypi.org/project/clibrary-hub/">View on PyPI</a>
+    </div>
+
+    <div class="quickstart-code">
+      <div class="qs-tabs" id="qs-tabs">
+        <button class="qs-tab active" data-tab="route">Route</button>
+        <button class="qs-tab" data-tab="validate">Validate</button>
+        <button class="qs-tab" data-tab="agent">In an agent</button>
+      </div>
+
+      <div class="qs-panel active" data-panel="route"><pre><code><span class="qs-com"># pip install clibrary-hub</span>
+<span class="qs-com"># clibrary-build-index --manifest-dir ./manifests</span>
+
+<span class="qs-key">from</span> <span class="qs-imp">clibrary_hub</span> <span class="qs-key">import</span> <span class="qs-imp">router</span>
+
+result = router.<span class="qs-fn">route</span>(<span class="qs-str">"convert demo.mp4 to a 10-fps gif"</span>)
+
+<span class="qs-fn">print</span>(result[<span class="qs-str">"cli"</span>])         <span class="qs-com"># 'video-to-gif'</span>
+<span class="qs-fn">print</span>(result[<span class="qs-str">"params"</span>])      <span class="qs-com"># {'input': 'demo.mp4', ...}</span>
+<span class="qs-fn">print</span>(result[<span class="qs-str">"confidence"</span>])  <span class="qs-com"># 0.94</span></code></pre></div>
+
+      <div class="qs-panel" data-panel="validate"><pre><code><span class="qs-key">from</span> <span class="qs-imp">clibrary_hub</span> <span class="qs-key">import</span> <span class="qs-imp">validator</span>
+
+r = validator.<span class="qs-fn">validate_file</span>(<span class="qs-str">"manifests/data/sql-runner.json"</span>)
+
+<span class="qs-key">if</span> <span class="qs-key">not</span> r.ok:
+    <span class="qs-key">for</span> e <span class="qs-key">in</span> r.errors:   <span class="qs-fn">print</span>(<span class="qs-str">"ERROR:"</span>, e)
+    <span class="qs-key">for</span> w <span class="qs-key">in</span> r.warnings: <span class="qs-fn">print</span>(<span class="qs-str">"WARN: "</span>, w)
+
+<span class="qs-com"># Or validate every manifest under a tree:</span>
+results = validator.<span class="qs-fn">validate_dir</span>(<span class="qs-str">"manifests/"</span>)</code></pre></div>
+
+      <div class="qs-panel" data-panel="agent"><pre><code><span class="qs-key">from</span> <span class="qs-imp">clibrary_hub</span> <span class="qs-key">import</span> <span class="qs-imp">router</span>
+<span class="qs-key">import</span> <span class="qs-imp">subprocess</span>
+
+<span class="qs-key">def</span> <span class="qs-fn">handle_user</span>(message: <span class="qs-imp">str</span>):
+    plan = router.<span class="qs-fn">route</span>(message)
+
+    <span class="qs-key">if</span> plan[<span class="qs-str">"action"</span>] == <span class="qs-str">"clarify"</span>:
+        <span class="qs-com"># Let your LLM choose from plan["choices"]</span>
+        plan = <span class="qs-fn">llm_pick</span>(plan[<span class="qs-str">"choices"</span>], chat_history)
+
+    cmd = [plan[<span class="qs-str">"cli"</span>]] + <span class="qs-fn">flatten</span>(plan[<span class="qs-str">"params"</span>])
+    <span class="qs-key">return</span> subprocess.<span class="qs-fn">run</span>(cmd, check=<span class="qs-num2">True</span>)</code></pre></div>
+    </div>
   </div>
 </section>
 
