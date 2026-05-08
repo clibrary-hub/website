@@ -80,11 +80,11 @@
 <section class="feature-row human-side" id="how">
   <div class="feature-text">
     <div class="feature-tag">一般使用者 · 過程視角</div>
-    <h2>直接呼叫<br>看著結果回來</h2>
+    <h2>怎麼呼叫 router</h2>
     <p class="feature-lead">
-      在 Python REPL、notebook 或自己的工具裡呼叫 router。輸入一段自然語言，
-      終端機就回傳一個結構化的 tool-call 物件——cli 名稱、參數、confidence
-      你自己決定要怎麼跑這個指令，沒有任何魔法
+      在 Python REPL、notebook 或自己的程式裡 import 進來就能用
+      你說一句話的意圖，它就回給你「該呼叫哪個 cli、要帶什麼參數、信心分數多高」
+      拿到這份結果以後，你自己決定要不要執行、怎麼執行——沒有黑魔法，也不會偷打外部 API
     </p>
     <a class="feature-cta" href="https://github.com/clibrary-hub/CLIbrary">看原始碼</a>
   </div>
@@ -114,11 +114,12 @@
 <section class="feature-row agent-side reverse">
   <div class="feature-text">
     <div class="feature-tag">LLM AGENT · 用戶視角</div>
-    <h2>同一個 call<br>包成自然對話</h2>
+    <h2>agent 跟 router<br>怎麼配合調用工具</h2>
     <p class="feature-lead">
-      在 agent 迴圈裡，router 一樣回傳結構化物件——但用戶從頭到尾看不到 raw JSON
-      Agent 讀候選、選一個、執行工具、再用自然語言回報結果
-      不需要把工具描述塞進 prompt，token 不會爆
+      Agent 收到使用者的話以後，把它丟給 router
+      Router 回的不是 JSON 給使用者看，而是一份「要做什麼、用哪個工具、帶什麼參數」的計畫，agent 拿到後自己處理
+      Agent 看候選、挑一個、執行工具，最後再用人話跟使用者說結果
+      不用把幾百個工具描述都塞進 prompt，token 也不會爆
     </p>
     <a class="feature-cta" href="/zh/create.html">寫一個 manifest</a>
   </div>
